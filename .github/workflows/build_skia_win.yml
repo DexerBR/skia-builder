@@ -31,7 +31,7 @@ jobs:
 
     - name: Build skia for windows
       run: |
-        skia-builder build --archive
+        skia-builder build --target-cpu=x64 --archive
 
     # - name: Upload artifacts
     #   uses: actions/upload-artifact@v4.4.3
@@ -45,7 +45,7 @@ jobs:
       with:
         name: ${{ github.ref_name }}
         files: |
-          output/windows-x64.tar.gz
+          output/windows-x64/windows-x64.tar.gz
         draft: true
       # env:
       #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

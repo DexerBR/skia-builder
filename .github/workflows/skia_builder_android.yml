@@ -1,4 +1,4 @@
-name: Build Skia - Linux (x64)
+name: Build Skia - Android (arm, arm64, x64, x86)
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - 'v[0-9][0-9][0-9][0-9].[0-1][0-9].[0-3][0-9]*'
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build-windows:
+    runs-on: windows-latest
 
     permissions:
       contents: write
@@ -25,19 +25,22 @@ jobs:
       run: |
         pip install .
 
-    - name: Setup skia environment for linux
+    - name: Setup skia environment for windows + android
       run: |
-        skia-builder setup-env
+        skia-builder setup-env --sub-env=Android
 
-    - name: Build skia for linux
+    - name: Build skia for android (arm, arm64, x64, x86)
       run: |
-        skia-builder build --target-cpu=x64 --archive
+        skia-builder build --sub-env=Android --target-cpu=arm --archive
+        skia-builder build --sub-env=Android --target-cpu=arm64 --archive
+        skia-builder build --sub-env=Android --target-cpu=x64 --archive
+        skia-builder build --sub-env=Android --target-cpu=x86 --archive
 
     # - name: Upload artifacts
     #   uses: actions/upload-artifact@v4.4.3
     #   with:
     #     name: skia-artifacts
-    #     path: output/linux-x64.tar.gz
+    #     path: output/windows-x64.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')
@@ -45,7 +48,10 @@ jobs:
       with:
         name: ${{ github.ref_name }}
         files: |
-          output/linux-x64/linux-x64.tar.gz
+          output/android-arm/android-arm.tar.gz
+          output/android-arm64/android-arm64.tar.gz
+          output/android-x64/android-x64.tar.gz
+          output/android-x86/android-x86.tar.gz
         draft: true
       # env:
       #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

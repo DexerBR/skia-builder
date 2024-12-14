@@ -78,8 +78,6 @@ platform_specific_flags = {
         "cc": "clang-cl",
         "cxx": "clang-cl++",
         "clang_win": "C:/Program Files/LLVM",
-        # "extra_cflags_cc": ["/std:c++17"],
-        "extra_cflags": ["/D_DLL_EXPORT"],
         "extra_cflags_cc": ["/std:c++17"],
     },
     "linux-x64": {

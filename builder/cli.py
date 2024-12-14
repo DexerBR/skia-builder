@@ -12,6 +12,19 @@ from builder.platforms import (
 )
 
 
+def get_supported_architectures(platform):
+    arch_map = {
+        "Android": android.SUPPORTED_ARCHITECTURES,
+        # "iOS": ios.SUPPORTED_ARCHITECTURES,
+        "Linux": linux.SUPPORTED_ARCHITECTURES,
+        # "Darwin": darwin.SUPPORTED_ARCHITECTURES,
+        "Windows": windows.SUPPORTED_ARCHITECTURES,
+    }
+
+    archs = arch_map.get(platform)
+    return archs
+
+
 def setup_env(platform, sub_env=None):
     platform_actions = {
         "Android": android.setup_env,
@@ -20,19 +33,28 @@ def setup_env(platform, sub_env=None):
         # "Darwin": darwin.setup_env,
         "Windows": windows.setup_env,
     }
-    
-    # Use sub_env if provided, otherwise default to the detected platform
-    target_platform = sub_env if sub_env else platform
-    
-    action = platform_actions.get(target_platform)
+
+    # Retrieve the setup action for the given platform
+    action = platform_actions.get(platform)
+
     if action:
+        # Set up the main platform environment
         action()
+
+        # If a sub-environment is provided, set it up after the platform setup
+        if sub_env:
+            sub_env_action = platform_actions.get(sub_env)
+            if sub_env_action:
+                sub_env_action()  # Set up the sub-environment
+            else:
+                print(f"Unknown sub-environment: {sub_env}")
+                sys.exit(1)
     else:
-        print(f"Unknown platform: {target_platform}")
+        print(f"Unknown platform: {platform}")
         sys.exit(1)
 
 
-def build(platform, custom_build_args, archive_build_output, sub_env=None):
+def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env=None):
     platform_actions = {
         "Android": android.build,
         # "iOS": ios.build,
@@ -40,54 +62,80 @@ def build(platform, custom_build_args, archive_build_output, sub_env=None):
         # "Darwin": darwin.build,
         "Windows": windows.build,
     }
-    
+
     # Use sub_env if provided, otherwise default to the detected platform
     target_platform = sub_env if sub_env else platform
-    
+
     action = platform_actions.get(target_platform)
     if action:
-        action(custom_build_args, archive_build_output)
+        action(target_cpu, custom_build_args, archive_build_output)
     else:
         print(f"Unknown platform: {target_platform}")
         sys.exit(1)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Skia Builder Script")
-    parser.add_argument(
-        "command",
-        type=str,
-        help="Command to execute, e.g., setup-env, build",
-    )
-    parser.add_argument(
+    parser = argparse.ArgumentParser(prog="skia-builder", description="Skia Builder Script")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # setup-env subcommand
+    setup_env_parser = subparsers.add_parser("setup-env", help="Set up the environment")
+    setup_env_parser.add_argument(
         "--sub-env",
         type=str,
-        help="Optional sub-environment to configure, e.g., Android, iOS",
+        choices=["Android", "iOS"],
+        help="Sub-environment to configure (e.g., Android, iOS)",
     )
-    parser.add_argument(
-        "--custom-build-args",
+    setup_env_parser.set_defaults(func=setup_env)
+
+    # build subcommand
+    build_parser = subparsers.add_parser("build", help="Builds the skia binaries")
+    build_parser.add_argument(
+        "--sub-env",
         type=str,
-        help="Custom arguments for the build configuration",
+        choices=["Android", "iOS"],
+        help="Sub-environment to build (e.g., Android, iOS)",
     )
-    parser.add_argument(
-        "--archive",
-        action="store_true",
-        help="Archive the build output after compilation",
+    build_parser.add_argument(
+        "--target-cpu", type=str, help="Target CPU architecture (e.g., arm, arm64, x86, x64)"
     )
+    build_parser.add_argument(
+        "--custom-build-args", type=str, help="Custom arguments for the build configuration"
+    )
+    build_parser.add_argument(
+        "--archive", action="store_true", help="Archive the build output after compilation"
+    )
+    build_parser.set_defaults(func=build)
 
     args = parser.parse_args()
-    custom_build_args = (
-        parse_custom_build_args(args.custom_build_args)
-        if args.custom_build_args
-        else {}
-    )
-
     current_platform = platform.system()
 
     if args.command == "setup-env":
         setup_env(current_platform, args.sub_env)
+
     elif args.command == "build":
-        build(current_platform, custom_build_args, args.archive, args.sub_env)
+        if not args.target_cpu:
+            print("Error: --target-cpu must be specified for the build command.")
+            sys.exit(1)
+
+        # Validate if target CPU is supported
+        supported_architectures = get_supported_architectures(
+            args.sub_env if args.sub_env else current_platform
+        )
+        if args.target_cpu not in supported_architectures:
+            print(
+                f"Unsupported CPU architecture for {args.sub_env or current_platform}: {args.target_cpu}. "
+                f"Supported architectures are: {', '.join(supported_architectures)}"
+            )
+            sys.exit(1)
+
+        # Parse custom build arguments if provided
+        custom_build_args = (
+            parse_custom_build_args(args.custom_build_args) if args.custom_build_args else {}
+        )
+
+        build(current_platform, args.target_cpu, custom_build_args, args.archive, args.sub_env)
+
     else:
         print(f"Unknown command: {args.command}")
         sys.exit(1)
@@ -95,13 +143,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-# skia-builder setup-env
-# skia-builder setup-env --sub-env=Android
-# skia-builder build --sub-env=Android
-# skia-builder build --custom-build-args="cc=clang cxx=clang++ skia_compile_modules=true ..."
-# skia-builder build --archive --custom-build-args="cc=clang cxx=clang++ skia_compile_modules=true ..."

@@ -7,6 +7,10 @@ from builder.utils import (
     run_command,
     store_includes,
 )
+from builder.versions import SKIA_VERSION
+
+
+SUPPORTED_ARCHITECTURES = ("x64",)
 
 
 def setup_env():
@@ -20,34 +24,29 @@ def setup_env():
     # Install Bazelisk
     run_command(
         [
-            "sudo", "wget", 
+            "sudo",
+            "wget",
             "https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/bazelisk-linux-amd64",
-            "-O", "/usr/local/bin/bazelisk"
+            "-O",
+            "/usr/local/bin/bazelisk",
         ],
-        "Downloading Bazelisk"
+        "Downloading Bazelisk",
     )
     # run_command(
     #     ["sudo", "chmod", "+x", "/usr/local/bin/bazelisk"],
     #     "Making Bazelisk executable"
     # )
-    run_command(
-        ["bazelisk", "version"],
-        "Testing Bazelisk installation"
-    )
+    run_command(["bazelisk", "version"], "Testing Bazelisk installation")
 
     # Install LLVM
     run_command(
         ["wget", "https://apt.llvm.org/llvm.sh", "-O", "/tmp/llvm.sh"],
-        "Downloading LLVM installation script"
+        "Downloading LLVM installation script",
     )
     run_command(
-        ["sudo", "chmod", "+x", "/tmp/llvm.sh"],
-        "Making LLVM installation script executable"
+        ["sudo", "chmod", "+x", "/tmp/llvm.sh"], "Making LLVM installation script executable"
     )
-    run_command(
-        ["sudo", "bash", "/tmp/llvm.sh"],
-        "Running LLVM installation script"
-    )
+    run_command(["sudo", "bash", "/tmp/llvm.sh"], "Running LLVM installation script")
     # run_command(
     #     ["which", "clang"],
     #     "Check clang version"
@@ -81,18 +80,18 @@ def setup_env():
 
     skia_path = os.path.join(os.getcwd(), "skia")
 
-    # Fetch and checkout to the specific branch (Chrome/m131)
+    # Fetch and checkout to the specific branch (Chrome/SKIA_VERSION)
     run_command(
         ["git", "fetch", "-v"],
         "Fetching Skia Repository",
         cwd=skia_path,
     )
     run_command(
-        ["git", "checkout", "origin/chrome/m131"],
-        "Checking out Chrome/m131 branch",
+        ["git", "checkout", f"origin/chrome/{SKIA_VERSION}"],
+        f"Checking out Chrome/{SKIA_VERSION} branch",
         cwd=skia_path,
     )
-    
+
     # Install Skia extra dependencies
     run_command(
         [os.path.join(os.getcwd(), "skia", "tools", "install_dependencies.sh")],
@@ -115,28 +114,25 @@ def setup_env():
     )
 
 
-def build(custom_build_args=None, archive_output=False):
+def build(target_cpu, custom_build_args=None, archive_output=False):
+    Logger.info(f"Building with {'custom' if custom_build_args else 'default'} " "arguments.")
     Logger.info(
-        f"Building with {'custom' if custom_build_args else 'default'} "
-        "arguments."
-    )
-    Logger.info(
-        "Archiving build output."
-        if archive_output
-        else "Build output will not be archived."
+        "Archiving build output." if archive_output else "Build output will not be archived."
     )
 
     skia_path = os.path.join(os.getcwd(), "skia")
+    build_target = f"linux-{target_cpu}"
+    output_dir = os.path.join("output", build_target)
 
     if archive_output:
-        store_includes(skia_path)
+        store_includes(skia_path, output_dir=output_dir)
 
-    build_args = custom_build_args or get_build_args("linux-x64")
+    build_args = custom_build_args or get_build_args(build_target)
     run_command(
         [
             os.path.join(os.getcwd(), "skia", "bin", "gn"),
             "gen",
-            "out/linux-x64",
+            f"out/{build_target}",
             f"--args={build_args}",
         ],
         "Generating Build Files",
@@ -144,10 +140,17 @@ def build(custom_build_args=None, archive_output=False):
     )
 
     run_command(
-        [os.path.join(os.getcwd(), "depot_tools", "ninja"), "-C", "out/linux-x64"],
-        "Building Skia for linux-x64",
+        [
+            os.path.join(os.getcwd(), "depot_tools", "ninja"),
+            "-C",
+            f"out/{build_target}",
+        ],
+        f"Building Skia for {build_target}",
         cwd=skia_path,
     )
 
     if archive_output:
-        archive_build_output(os.path.join(skia_path, "out", "linux-x64"))
+        archive_build_output(
+            os.path.join(skia_path, "out", f"{build_target}"),
+            output_dir=output_dir,
+        )

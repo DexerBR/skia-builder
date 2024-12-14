@@ -167,7 +167,7 @@ def store_includes(skia_dir, output_dir=None):
             Logger.error(f"{src_folder} does not exist.")
 
 
-def archive_build_output(build_input_src, output_dir=None):
+def archive_build_output(build_input_src, platform=platform.system(), output_dir=None):
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
 
@@ -183,7 +183,7 @@ def archive_build_output(build_input_src, output_dir=None):
     os.makedirs(output_bin_dir, exist_ok=True)
 
     # Get the list of files with the specified extensions
-    matching_files = get_files_with_extensions(build_input_src, bin_extensions_by_platform[platform.system()])
+    matching_files = get_files_with_extensions(build_input_src, bin_extensions_by_platform[platform])
 
     # Copy each matching file to the output_bin_dir
     for file_path in matching_files:

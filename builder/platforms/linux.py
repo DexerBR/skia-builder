@@ -10,7 +10,7 @@ from builder.utils import (
 from builder.versions import SKIA_VERSION
 
 
-SUPPORTED_ARCHITECTURES = ("x64",)
+SUPPORTED_ARCHITECTURES = ("arm64", "x64")
 
 
 def setup_env():
@@ -26,7 +26,7 @@ def setup_env():
         [
             "sudo",
             "wget",
-            "https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/bazelisk-linux-amd64",
+            "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64",
             "-O",
             "/usr/local/bin/bazelisk",
         ],
@@ -35,7 +35,7 @@ def setup_env():
     # run_command(
     #     ["sudo", "chmod", "+x", "/usr/local/bin/bazelisk"],
     #     "Making Bazelisk executable"
-    # )
+    # )  # TODO: Investigate why this is required on the local machine but not in GitHub Actions
     run_command(["bazelisk", "version"], "Testing Bazelisk installation")
 
     # Install LLVM
@@ -47,6 +47,14 @@ def setup_env():
         ["sudo", "chmod", "+x", "/tmp/llvm.sh"], "Making LLVM installation script executable"
     )
     run_command(["sudo", "bash", "/tmp/llvm.sh"], "Running LLVM installation script")
+    # run_command(
+    #     ["echo", 'export PATH=/usr/lib/llvm-18/bin:$PATH', ">>", "~/.bashrc"],
+    #     "Adding LLVM to PATH"
+    # )
+    # run_command(
+    #     ["bash", "-c", "source ~/.bashrc"],
+    #     "Reloading bashrc to apply changes"
+    # )
     # run_command(
     #     ["which", "clang"],
     #     "Check clang version"
@@ -94,7 +102,7 @@ def setup_env():
 
     # Install Skia extra dependencies
     run_command(
-        [os.path.join(os.getcwd(), "skia", "tools", "install_dependencies.sh")],
+        [os.path.join(os.getcwd(), "skia", "tools", "install_dependencies.sh"), "-y"],
         "Install Skia Extra Dependencies",
         cwd=skia_path,
     )

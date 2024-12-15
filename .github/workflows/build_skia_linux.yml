@@ -32,6 +32,7 @@ jobs:
     - name: Build skia for linux
       run: |
         skia-builder build --target-cpu=x64 --archive
+        skia-builder build --target-cpu=arm64 --archive
 
     # - name: Upload artifacts
     #   uses: actions/upload-artifact@v4.4.3
@@ -46,6 +47,7 @@ jobs:
         name: ${{ github.ref_name }}
         files: |
           output/linux-x64/linux-x64.tar.gz
+          output/linux-arm64/linux-arm64.tar.gz
         draft: true
       # env:
       #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

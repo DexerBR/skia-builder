@@ -63,6 +63,22 @@ android_base_flags = {
 }
 
 
+linux_base_flags = {
+    # graphics backends
+    "skia_use_gl": True,
+    "skia_use_vulkan": True,
+    "skia_use_direct3d": False,
+    "skia_use_angle": False,
+    "skia_use_dawn": False,
+    "skia_use_metal": False,
+    # build env configs
+    "target_os": "linux",
+    "cc": "clang",
+    "cxx": "clang++",
+    "extra_cflags_cc": ["-std=c++17"],
+}
+
+
 platform_specific_flags = {
     "windows-x64": {
         # graphics backends
@@ -81,20 +97,33 @@ platform_specific_flags = {
         "extra_cflags_cc": ["/std:c++17"],
     },
     "linux-x64": {
-        # graphics backends
-        "skia_use_gl": True,
-        "skia_use_vulkan": True,
-        "skia_use_direct3d": False,
-        "skia_use_angle": False,
-        "skia_use_dawn": False,
-        "skia_use_metal": False,
-        # build env configs
-        "target_os": "linux",
+        **linux_base_flags,
         "target_cpu": "x86_64",
-        "cc": "clang",
-        "cxx": "clang++",
-        "extra_cflags_cc": ["-std=c++17"],
     },
+    "linux-arm64": {
+        **linux_base_flags,
+        "target_cpu": "arm64",
+        "extra_cflags_cc": [
+            "-std=c++17",
+            "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
+        ],
+        "extra_cflags": [
+            "-g0",  # Removes debug symbols from the binary to reduce its size - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
+            "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
+        ],
+    },
+    # "linux-arm": {
+    #     **linux_base_flags,
+    #     "target_cpu": "arm",
+    #     "extra_cflags_cc": [
+    #         "-std=c++17",
+    #         "--target=arm-linux-gnueabihf",  # Target for ARM (32-bit with hard-float ABI)
+    #     ],
+    #     "extra_cflags": [
+    #         "-g0",  # Removes debug symbols from the binary to reduce its size - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
+    #         "--target=arm-linux-gnueabihf",  # Target for ARM (32-bit with hard-float ABI)
+    #     ],
+    # },
     "android-arm": {
         **android_base_flags,
         "target_cpu": "arm",

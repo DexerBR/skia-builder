@@ -31,8 +31,8 @@ jobs:
 
     - name: Build skia for linux
       run: |
-        skia-builder build --target-cpu=x64 --archive
         skia-builder build --target-cpu=arm64 --archive
+        skia-builder build --target-cpu=x64 --archive
 
     # - name: Upload artifacts
     #   uses: actions/upload-artifact@v4.4.3

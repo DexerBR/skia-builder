@@ -14,11 +14,11 @@ SUPPORTED_ARCHITECTURES = ("arm64", "x64")
 
 
 def setup_env():
-    # # Update package lists
-    # run_command(
-    #     ["sudo", "apt-get", "update"],
-    #     "Updating package lists",
-    # )
+    # Update package lists
+    run_command(
+        ["sudo", "apt-get", "update"],
+        "Updating package lists",
+    )
 
     # FIXME: update to make it install the lastest release
     # Install Bazelisk
@@ -63,6 +63,26 @@ def setup_env():
     #     ["clang", "--version"],
     #     "Check clang version"
     # )
+
+    # Install necessary packages for ARM64 cross-compilation (GCC and development libraries)
+    run_command(
+        ["sudo", "apt-get", "install", "gcc-aarch64-linux-gnu", "-y"],
+        "Installing GCC cross-compiler for ARM64 (C language)",
+    )
+    run_command(
+        ["sudo", "apt-get", "install", "g++-aarch64-linux-gnu", "-y"],
+        "Installing G++ cross-compiler for ARM64 (C++ language)",
+    )
+    # run_command(
+    #     ["sudo", "apt-get", "install", "libc6-dev-arm64-cross", "-y"],
+    #     "Installing libc6-dev-arm64-cross for ARM64 libraries",
+    # )
+    # run_command(
+    #     ["sudo", "apt-get", "install", "libc-dev-arm64-cross", "-y"],
+    #     "Installing libc-dev-arm64-cross for ARM64 libraries",
+    # )
+    # sudo apt install gcc-multilib g++-multilib
+
 
     # Clone depot_tools
     run_command(

@@ -1,0 +1,53 @@
+name: Build Skia - macOS (x64)
+
+on:
+  push:
+    tags:
+      - 'v[0-9][0-9][0-9][0-9].[0-1][0-9].[0-3][0-9]*'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.2.2
+
+    - name: Set up python
+      uses: actions/setup-python@v5.3.0
+      with:
+        python-version: '3.11'
+
+    - name: Install skia-builder
+      run: |
+        pip install .
+
+    - name: Setup skia environment for macOS
+      run: |
+        skia-builder setup-env
+
+    - name: Build skia for macOS
+      run: |
+        skia-builder build --target-cpu=arm64 --archive
+        skia-builder build --target-cpu=x64 --archive
+
+    # - name: Upload artifacts
+    #   uses: actions/upload-artifact@v4.4.3
+    #   with:
+    #     name: skia-artifacts
+    #     path: output/macos-x64.tar.gz
+
+    - name: Upload artifacts to release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2.1.0
+      with:
+        name: ${{ github.ref_name }}
+        files: |
+          output/macos-x64/macos-x64.tar.gz
+          output/macos-arm64/macos-arm64.tar.gz
+        draft: true
+      # env:
+      #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

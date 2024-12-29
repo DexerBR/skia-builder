@@ -7,7 +7,7 @@ from builder.platforms import (
     android,
     # ios,
     linux,
-    # darwin,
+    darwin,
     windows,
 )
 
@@ -17,7 +17,7 @@ def get_supported_architectures(platform):
         "Android": android.SUPPORTED_ARCHITECTURES,
         # "iOS": ios.SUPPORTED_ARCHITECTURES,
         "Linux": linux.SUPPORTED_ARCHITECTURES,
-        # "Darwin": darwin.SUPPORTED_ARCHITECTURES,
+        "Darwin": darwin.SUPPORTED_ARCHITECTURES,
         "Windows": windows.SUPPORTED_ARCHITECTURES,
     }
 
@@ -30,7 +30,7 @@ def setup_env(platform, sub_env=None):
         "Android": android.setup_env,
         # "iOS": ios.setup_env,
         "Linux": linux.setup_env,
-        # "Darwin": darwin.setup_env,
+        "Darwin": darwin.setup_env,
         "Windows": windows.setup_env,
     }
 
@@ -59,7 +59,7 @@ def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env
         "Android": android.build,
         # "iOS": ios.build,
         "Linux": linux.build,
-        # "Darwin": darwin.build,
+        "Darwin": darwin.build,
         "Windows": windows.build,
     }
 

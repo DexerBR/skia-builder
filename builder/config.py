@@ -8,7 +8,7 @@ DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), "output")
 bin_extensions_by_platform = {
     "Windows": ("lib", "dat"),
     "Linux": ("a", "dat"),
-    # "Darwin": ("a", "dat"),
+    "Darwin": ("a", "dat"),
     "Android": ("a", "dat"),
     # "iOS": ("a", "dat"),
 }
@@ -78,6 +78,17 @@ linux_base_flags = {
     "extra_cflags_cc": ["-std=c++17"],
 }
 
+macos_base_flags = {
+    # graphics backends
+    "skia_use_gl": True,
+    "skia_use_vulkan": False,
+    "skia_use_direct3d": False,
+    "skia_use_angle": False,
+    "skia_use_dawn": False,
+    "skia_use_metal": True,
+    # build env configs
+    "target_os": "mac",
+}
 
 platform_specific_flags = {
     "windows-x64": {
@@ -148,14 +159,14 @@ platform_specific_flags = {
         "skia_use_dawn": False,
         "skia_use_metal": True,
     },
-    "macos": {
-        "skia_use_gl": True,
-        "skia_use_vulkan": False,
-        "skia_use_direct3d": False,
-        "skia_use_angle": True,
-        "skia_use_dawn": False,
-        "skia_use_metal": True,
+    "macos-x64": {
+        **macos_base_flags,
+        "target_cpu": "x64",
     },
+    "macos-arm64": {
+        **macos_base_flags,
+        "target_cpu": "arm64",
+    }
 }
 
 

@@ -88,6 +88,9 @@ macos_base_flags = {
     "skia_use_metal": True,
     # build env configs
     "target_os": "mac",
+    "skia_gl_standard": os.environ.get(
+        "SKIABUILDER_SKIA_GL_STANDARD", "gles"
+    ),
 }
 
 platform_specific_flags = {

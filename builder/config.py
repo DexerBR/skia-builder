@@ -10,7 +10,8 @@ bin_extensions_by_platform = {
     "Linux": ("a", "dat"),
     "Darwin": ("a", "dat"),
     "Android": ("a", "dat"),
-    # "iOS": ("a", "dat"),
+    "iOS": ("a", "dat"),
+    "iOSSimulator": ("a", "dat"),
 }
 
 
@@ -93,6 +94,19 @@ macos_base_flags = {
     ),
 }
 
+ios_base_flags = {
+    # graphics backends
+    "skia_use_gl": True,
+    "skia_use_vulkan": False,
+    "skia_use_direct3d": False,
+    "skia_use_angle": False,
+    "skia_use_dawn": False,
+    "skia_use_metal": True,
+    # build env configs
+    "target_os": "ios",
+    "ios_min_target": "13.0",
+}
+
 platform_specific_flags = {
     "windows-x64": {
         # graphics backends
@@ -154,13 +168,19 @@ platform_specific_flags = {
         **android_base_flags,
         "target_cpu": "x86",
     },
-    "ios": {
-        "skia_use_gl": True,
-        "skia_use_vulkan": False,
-        "skia_use_direct3d": False,
-        "skia_use_angle": True,
-        "skia_use_dawn": False,
-        "skia_use_metal": True,
+    "ios-arm64": {
+        **ios_base_flags,
+        "target_cpu": "arm64",
+    },
+    "iossimulator-arm64": {
+        **ios_base_flags,
+        "target_cpu": "arm64",
+        "ios_use_simulator": True,
+    },
+    "iossimulator-x64": {
+        **ios_base_flags,
+        "target_cpu": "x64",
+        "ios_use_simulator": True,
     },
     "macos-x64": {
         **macos_base_flags,

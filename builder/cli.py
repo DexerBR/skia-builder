@@ -5,7 +5,8 @@ import sys
 from builder.config import parse_custom_build_args
 from builder.platforms import (
     android,
-    # ios,
+    ios,
+    iossimulator,
     linux,
     darwin,
     windows,
@@ -15,7 +16,8 @@ from builder.platforms import (
 def get_supported_architectures(platform):
     arch_map = {
         "Android": android.SUPPORTED_ARCHITECTURES,
-        # "iOS": ios.SUPPORTED_ARCHITECTURES,
+        "iOS": ios.SUPPORTED_ARCHITECTURES,
+        "iOSSimulator": iossimulator.SUPPORTED_ARCHITECTURES,
         "Linux": linux.SUPPORTED_ARCHITECTURES,
         "Darwin": darwin.SUPPORTED_ARCHITECTURES,
         "Windows": windows.SUPPORTED_ARCHITECTURES,
@@ -28,7 +30,8 @@ def get_supported_architectures(platform):
 def setup_env(platform, sub_env=None):
     platform_actions = {
         "Android": android.setup_env,
-        # "iOS": ios.setup_env,
+        "iOS": ios.setup_env,
+        "iOSSimulator": iossimulator.setup_env,
         "Linux": linux.setup_env,
         "Darwin": darwin.setup_env,
         "Windows": windows.setup_env,
@@ -57,7 +60,8 @@ def setup_env(platform, sub_env=None):
 def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env=None):
     platform_actions = {
         "Android": android.build,
-        # "iOS": ios.build,
+        "iOS": ios.build,
+        "iOSSimulator": iossimulator.build,
         "Linux": linux.build,
         "Darwin": darwin.build,
         "Windows": windows.build,
@@ -83,7 +87,7 @@ def main():
     setup_env_parser.add_argument(
         "--sub-env",
         type=str,
-        choices=["Android", "iOS"],
+        choices=["Android", "iOS", "iOSSimulator"],
         help="Sub-environment to configure (e.g., Android, iOS)",
     )
     setup_env_parser.set_defaults(func=setup_env)
@@ -93,7 +97,7 @@ def main():
     build_parser.add_argument(
         "--sub-env",
         type=str,
-        choices=["Android", "iOS"],
+        choices=["Android", "iOS", "iOSSimulator"],
         help="Sub-environment to build (e.g., Android, iOS)",
     )
     build_parser.add_argument(

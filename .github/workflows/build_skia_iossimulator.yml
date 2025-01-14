@@ -1,4 +1,4 @@
-name: Build Skia - iOS Simulator (arm64)
+name: Build Skia - iOS Simulator (arm64, x64)
 
 on:
   push:

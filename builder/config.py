@@ -117,15 +117,30 @@ platform_specific_flags = {
     "linux-arm64": {
         **linux_base_flags,
         "target_cpu": "arm64",
+        "skia_use_system_freetype2": False,
+        "skia_use_egl": True,
+        "skia_gl_standard": "gles",
         "extra_cflags_cc": [
             "-std=c++17",
             "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
+            # "-g",  # Debug info
+            # "-O0",  # No optimizations
         ],
         "extra_cflags": [
-            "-g0",  # Removes debug symbols from the binary to reduce its size - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
-            "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
+            "--target=aarch64-linux-gnu",
+            "-fPIC",  # Generate position-independent code - Compiling the cython file on RPi requerired it
+            # "-march=armv8-a",     # Target ARMv8-A architecture
+            # "-mtune=cortex-a72",  # Optimize for Cortex-A72 CPU
+            # "-mfpu=neon-fp-armv8", # Enable NEON floating-point instructions
+            # "-mfloat-abi=hard",   # Use hardware floating-point ABI
+            # "-g",  # Debug info
+            # "-O0",  # No optimizations
         ],
+        # "is_debug": True,
+        # "is_official_build": False,
+        # "skia_enable_optimize_size": False,
     },
+
     # "linux-arm": {
     #     **linux_base_flags,
     #     "target_cpu": "arm",

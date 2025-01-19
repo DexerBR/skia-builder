@@ -25,11 +25,11 @@ jobs:
       run: |
         pip install .
 
-    - name: Setup skia environment for windows
+    - name: Setup skia environment for Windows
       run: |
         skia-builder setup-env
 
-    - name: Build skia for windows
+    - name: Build skia for Windows
       run: |
         skia-builder build --target-cpu=x64 --archive
 
@@ -37,15 +37,14 @@ jobs:
     #   uses: actions/upload-artifact@v4.4.3
     #   with:
     #     name: skia-artifacts
-    #     path: output/windows-x64.tar.gz
+    #     path: |
+    #       output/windows-x64/windows-x64.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2.1.0
+      uses: softprops/action-gh-release@v2.2.1
       with:
         name: ${{ github.ref_name }}
         files: |
           output/windows-x64/windows-x64.tar.gz
         draft: true
-      # env:
-      #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

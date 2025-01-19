@@ -38,16 +38,16 @@ jobs:
     #   uses: actions/upload-artifact@v4.4.3
     #   with:
     #     name: skia-artifacts
-    #     path: output/iossimulator-arm64.tar.gz
+    #     path: |
+    #       output/iossimulator-arm64/iossimulator-arm64.tar.gz
+    #       output/iossimulator-x64/iossimulator-x64.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2.1.0
+      uses: softprops/action-gh-release@v2.2.1
       with:
         name: ${{ github.ref_name }}
         files: |
           output/iossimulator-arm64/iossimulator-arm64.tar.gz
           output/iossimulator-x64/iossimulator-x64.tar.gz
         draft: true
-      # env:
-      #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

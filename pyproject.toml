@@ -1,3 +1,49 @@
+[build-system]
+requires = [
+  "setuptools>=75.6.0",
+  "Cython>=3.0.11", 
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.cibuildwheel]
+skip = ["*-musllinux*", "pp*", "*-win32"]
+
+
+[project]
+name = "skia-builder"
+version = "0.0.0"
+description = "Cross-platform tool for Skia environment setup and binary generation"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+# authors = [{ name = "DexerBR", email = "73297572+DexerBR@users.noreply.github.com" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+#   "License :: OSI Approved :: LGPL-3.0 License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+keywords = ["skia", "tool", "cross-platform", "mobile", "desktop", "kivy"]
+dependencies = []
+
+
+[project.scripts]
+skia-builder = "builder.cli:main"
+
+
+[tool.setuptools]
+packages = ["builder"]
+# package-data = { "kivy_webview" = ["*", "cef/deps/include/**/*", "cef/deps/runtime/**/*"] }
+# exclude-package-data = { "kivy_webview" = ["*.txt"] }
+
+# [project.urls]
+# "Homepage" = "https://github.com/DexerBR/skia-builder"
+# "Bug Reports" = "https://github.com/DexerBR/skia-builder/issues"
+
+
 [tool.ruff]
 line-length = 100
 lint.select = ["E", "F", "W"]

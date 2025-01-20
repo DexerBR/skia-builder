@@ -4,7 +4,7 @@ from builder.platforms import execute_build
 from builder.utils import run_command
 from builder.versions import SKIA_VERSION
 
-SUPPORTED_ARCHITECTURES = ("x64",)
+SUPPORTED_ARCHITECTURES = "x64"
 
 
 def setup_env():
@@ -74,5 +74,5 @@ def setup_env():
     )
 
 
-def build(target_cpu, custom_build_args=None, archive_output=False):
-    execute_build(target_cpu, "windows", custom_build_args, archive_output)
+def build(target_cpu, custom_build_args=None, override_build_args=None, archive_output=False):
+    execute_build(target_cpu, "windows", custom_build_args, override_build_args, archive_output)

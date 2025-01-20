@@ -75,7 +75,16 @@ skia-builder build --sub-env=Android --target-cpu=arm64 --archive
 The `skia-builder` also allows passing custom arguments for the Skia build flags through `--custom-build-args=<args>`. When these arguments are defined, **`skia-builder` will prioritize them and automatically ignore all default arguments**. The command below will generate the binaries for Android within the host environment (Windows) for the `arm64` architecture, using the custom build args, and archive the output as mentioned above.
 
 
-***Important:*** The usage logic of `"` and `'` must be implemented exactly as shown in the example below.
+***Important:*** The usage logic of `"` and `'` must be implemented exactly as shown in the example below. Each flag definition should be separated by a space, and there should be no spaces within each flag definition.
+
+
+- 🟢 **Do:**`--custom-build-args="extra_cflags=['-g0']"`
+
+- 🔴 **Don't:** `--custom-build-args="extra_cflags =[ '-g0']"`
+
+- 🟢 **Do:**`--custom-build-args="extra_cflags=['-g0'] is_debug=false extra_cflags_cc=['-std=c++17'] ..."`
+
+- 🔴 **Don't:** `--custom-build-args="extra_cflags=[ '-g0'] is_debug =false  extra_cflags_cc=['-std=c++17' ] ..."`
 
 ```
 skia-builder build --sub-env=Android --target-cpu=arm64 --custom-build-args="extra_cflags=['-g0'] is_debug=false is_component_build=false cc='clang' cxx='clang++' extra_cflags_cc=['-std=c++17'] ..." --archive
@@ -86,4 +95,5 @@ skia-builder build --sub-env=Android --target-cpu=arm64 --custom-build-args="ext
 ### General Notes
 For macOS, we assume the built library will be used in an application that uses ANGLE as a GL provider. As a result, we force the `skia_gl_standard` setting to `"gles"`, since Skia cannot accurately detect the OpenGL version when running with ANGLE on macOS.
 
-If you intend to use Skia in an environment that does not rely on GLES (e.g., standard macOS OpenGL), you can override this default by setting the `SKIABUILDER_SKIA_GL_STANDARD` environment variable. This lets you specify a different value for the `skia_gl_standard` argument, such as `"gl"` (for default macOS OpenGL).
+If you intend to use Skia in an environment that does not rely on GLES (e.g., standard macOS OpenGL), you can override this default by passing
+`skia_gl_standard` to `--override-build-args` with the desired value, for example, `--override-build-args="skia_gl_standard='gl'"` (for the default macOS OpenGL).

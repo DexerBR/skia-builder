@@ -1,20 +1,30 @@
 import os
 
-from builder.config import get_build_args
+from builder.config import get_build_args, parse_override_build_args
 from builder.utils import Logger, archive_build_output, run_command, store_includes
 
 
-def execute_build(target_cpu, platform, custom_build_args=None, archive_output=False):
+def execute_build(
+    target_cpu,
+    platform,
+    custom_build_args=None,
+    override_build_args=None,
+    archive_output=False,
+):
     """
     Build Skia for a specified platform and CPU target.
 
     Args:
         target_cpu (str): The target CPU architecture (e.g., "arm64", "x64").
         platform (str): The target platform (e.g., "macos", "ios", "iossimulator", "linux", "windows", "android").
-        custom_build_args (str): Optional custom build arguments.
+        custom_build_args (str): Optional custom build flags.
         archive_output (bool): Whether to archive the build output.
     """
-    Logger.info(f"Building with {'custom' if custom_build_args else 'default'} arguments.")
+    flags_mode = "custom" if custom_build_args else "default"
+    Logger.info(f"Building with {flags_mode} flags.")
+    if override_build_args:
+        Logger.info(f"Overriding {flags_mode} build flags with: {override_build_args}.")
+
     Logger.info(
         "Archiving build output." if archive_output else "Build output will not be archived."
     )
@@ -27,16 +37,19 @@ def execute_build(target_cpu, platform, custom_build_args=None, archive_output=F
         store_includes(skia_path, output_dir=output_dir)
 
     build_args = custom_build_args or get_build_args(build_target)
+    if override_build_args:
+        build_args = parse_override_build_args(build_args, override_build_args)
+
     gn_executable = os.path.join(
         os.getcwd(),
         "skia",
         "bin",
-        f"gn{".exe" if platform == 'windows' else ''}",
+        f"gn{'.exe' if platform == 'windows' else ''}",
     )
     ninja_executable = os.path.join(
         os.getcwd(),
         "depot_tools",
-        f"ninja{".bat" if platform == 'windows' else ''}",
+        f"ninja{'.bat' if platform == 'windows' else ''}",
     )
 
     run_command(

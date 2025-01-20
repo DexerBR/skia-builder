@@ -63,9 +63,7 @@ class Logger:
 
 
 def run_command(command_list, step_description, cwd=None):
-    Logger.custom(
-        f"\n--- Running step: {step_description} ---", Logger.BRIGHT_YELLOW
-    )
+    Logger.custom(f"\n--- Running step: {step_description} ---", Logger.BRIGHT_YELLOW)
 
     process = None
     returncode = 0
@@ -95,9 +93,7 @@ def run_command(command_list, step_description, cwd=None):
                     break
                 log_function(line.strip())
 
-        stdout_thread = threading.Thread(
-            target=print_output, args=(process.stdout, print)
-        )
+        stdout_thread = threading.Thread(target=print_output, args=(process.stdout, print))
         stderr_thread = threading.Thread(
             target=print_output,
             args=(process.stderr, lambda line: print(line, file=sys.stderr)),
@@ -183,16 +179,16 @@ def archive_build_output(build_input_src, target_platform, output_dir=None):
     os.makedirs(output_bin_dir, exist_ok=True)
 
     # Get the list of files with the specified extensions
-    matching_files = get_files_with_extensions(build_input_src, bin_extensions_by_platform[target_platform])
+    matching_files = get_files_with_extensions(
+        build_input_src, bin_extensions_by_platform[target_platform]
+    )
 
     # Copy each matching file to the output_bin_dir
     for file_path in matching_files:
         shutil.copy(file_path, output_bin_dir)
         Logger.info(f"Copied {file_path} to {output_bin_dir}")
 
-    tar_path = os.path.join(
-        output_dir, f"{os.path.basename(build_input_src)}.tar.gz"
-    )
+    tar_path = os.path.join(output_dir, f"{os.path.basename(build_input_src)}.tar.gz")
     with tarfile.open(tar_path, "w:gz") as tar:
         for name in os.listdir(output_dir):
             full_path = os.path.join(output_dir, name)

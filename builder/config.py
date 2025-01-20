@@ -92,7 +92,7 @@ macos_base_flags = {
     "skia_use_metal": True,
     # build env configs
     "target_os": "mac",
-    "skia_gl_standard": os.environ.get("SKIABUILDER_SKIA_GL_STANDARD", "gles"),
+    "skia_gl_standard": "gles",
 }
 
 ios_base_flags = {
@@ -189,6 +189,23 @@ platform_specific_flags = {
         "target_cpu": "arm64",
     },
 }
+
+
+def parse_override_build_args(base_args_str, override_args_str):
+    base_args = base_args_str.replace("'", '"').split()
+    override_args = override_args_str.replace("'", '"').split()
+
+    for override_arg in override_args:
+        flag_b, value_b = override_arg.split("=", 1)
+
+        # Loop through base_args and update the matching flag-value pairs
+        for i, custom_arg in enumerate(base_args):
+            flag_a, _ = custom_arg.split("=", 1)
+            if flag_a == flag_b:
+                base_args[i] = f"{flag_a}={value_b}"
+                break
+
+    return " ".join(base_args)
 
 
 def get_build_args(target_platform):

@@ -59,5 +59,7 @@ def setup_env():
     )
 
 
-def build(target_cpu, custom_build_args=None, archive_output=False):
-    execute_build(target_cpu, "iossimulator", custom_build_args, archive_output)
+def build(target_cpu, custom_build_args=None, override_build_args=None, archive_output=False):
+    execute_build(
+        target_cpu, "iossimulator", custom_build_args, override_build_args, archive_output
+    )

@@ -57,7 +57,14 @@ def setup_env(platform, sub_env=None):
         sys.exit(1)
 
 
-def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env=None):
+def build(
+    platform,
+    target_cpu,
+    custom_build_args,
+    override_build_args,
+    archive_build_output,
+    sub_env=None,
+):
     PLATFORM_BUILDERS = {
         "Android": android.build,
         "iOS": ios.build,
@@ -72,7 +79,7 @@ def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env
 
     platform_builder = PLATFORM_BUILDERS.get(target_platform)
     if platform_builder:
-        platform_builder(target_cpu, custom_build_args, archive_build_output)
+        platform_builder(target_cpu, custom_build_args, override_build_args, archive_build_output)
     else:
         print(f"Unknown platform: {target_platform}")
         sys.exit(1)
@@ -107,6 +114,13 @@ def main():
         "--custom-build-args", type=str, help="Custom arguments for the build configuration"
     )
     build_parser.add_argument(
+        "--override-build-args",
+        type=str,
+        help=(
+            "Arguments to selectively override specific values in the default or custom build configuration"
+        ),
+    )
+    build_parser.add_argument(
         "--archive", action="store_true", help="Archive the build output after compilation"
     )
     build_parser.set_defaults(func=build)
@@ -134,11 +148,19 @@ def main():
             sys.exit(1)
 
         # Parse custom build arguments if provided
-        custom_build_args = (
-            parse_custom_build_args(args.custom_build_args) if args.custom_build_args else {}
+        custom_build_args, override_build_args = (
+            (parse_custom_build_args(arg) if arg else {})
+            for arg in [args.custom_build_args, args.override_build_args]
         )
 
-        build(current_platform, args.target_cpu, custom_build_args, args.archive, args.sub_env)
+        build(
+            current_platform,
+            args.target_cpu,
+            custom_build_args,
+            override_build_args,
+            args.archive,
+            args.sub_env,
+        )
 
     else:
         print(f"Unknown command: {args.command}")

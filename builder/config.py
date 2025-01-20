@@ -133,7 +133,7 @@ platform_specific_flags = {
         "skia_use_egl": True,
         "skia_gl_standard": "gles",
         "extra_cflags": [
-            *linux_base_flags["extra_cflags"],
+            *common_flags["extra_cflags"],
             "-fPIC",
             # "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
         ],

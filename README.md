@@ -28,8 +28,6 @@ Main environments and their supported sub-environments:
 | `Windows`  | `Android`        |
 
 
-
-
 <br>
 
 ## Usage
@@ -39,8 +37,6 @@ Main environments and their supported sub-environments:
 The `setup-env` command of `skia-builder` can be used to configure two types of environments: the main environment for Linux, macOS, and Windows, and the sub-environment (`sub-env`) for Android, iOS, and iOS Simulator.
 
 ***Note:*** The sub-environment configuration automatically sets up the main (host) environment.
-
-
 
 
 #### Examples:

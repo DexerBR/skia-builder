@@ -36,8 +36,7 @@ skia-builder = "builder.cli:main"
 
 [tool.setuptools]
 packages = ["builder"]
-# package-data = { "kivy_webview" = ["*", "cef/deps/include/**/*", "cef/deps/runtime/**/*"] }
-# exclude-package-data = { "kivy_webview" = ["*.txt"] }
+
 
 # [project.urls]
 # "Homepage" = "https://github.com/DexerBR/skia-builder"

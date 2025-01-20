@@ -6,12 +6,12 @@ DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), "output")
 
 
 bin_extensions_by_platform = {
-    "Windows": ("lib", "dat"),
-    "Linux": ("a", "dat"),
-    "Darwin": ("a", "dat"),
-    "Android": ("a", "dat"),
-    "iOS": ("a", "dat"),
-    "iOSSimulator": ("a", "dat"),
+    "windows": ("lib", "dat"),
+    "linux": ("a", "dat"),
+    "darwin": ("a", "dat"),
+    "android": ("a", "dat"),
+    "ios": ("a", "dat"),
+    "iossimulator": ("a", "dat"),
 }
 
 

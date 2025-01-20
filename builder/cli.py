@@ -28,7 +28,7 @@ def get_supported_architectures(platform):
 
 
 def setup_env(platform, sub_env=None):
-    platform_actions = {
+    PLATFORM_ENV_SETUP = {
         "Android": android.setup_env,
         "iOS": ios.setup_env,
         "iOSSimulator": iossimulator.setup_env,
@@ -38,15 +38,15 @@ def setup_env(platform, sub_env=None):
     }
 
     # Retrieve the setup action for the given platform
-    action = platform_actions.get(platform)
+    platform_env_setup = PLATFORM_ENV_SETUP.get(platform)
 
-    if action:
+    if platform_env_setup:
         # Set up the main platform environment
-        action()
+        platform_env_setup()
 
         # If a sub-environment is provided, set it up after the platform setup
         if sub_env:
-            sub_env_action = platform_actions.get(sub_env)
+            sub_env_action = platform_env_setup.get(sub_env)
             if sub_env_action:
                 sub_env_action()  # Set up the sub-environment
             else:
@@ -58,7 +58,7 @@ def setup_env(platform, sub_env=None):
 
 
 def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env=None):
-    platform_actions = {
+    PLATFORM_BUILDERS = {
         "Android": android.build,
         "iOS": ios.build,
         "iOSSimulator": iossimulator.build,
@@ -70,9 +70,9 @@ def build(platform, target_cpu, custom_build_args, archive_build_output, sub_env
     # Use sub_env if provided, otherwise default to the detected platform
     target_platform = sub_env if sub_env else platform
 
-    action = platform_actions.get(target_platform)
-    if action:
-        action(target_cpu, custom_build_args, archive_build_output)
+    platform_builder = PLATFORM_BUILDERS.get(target_platform)
+    if platform_builder:
+        platform_builder(target_cpu, custom_build_args, archive_build_output)
     else:
         print(f"Unknown platform: {target_platform}")
         sys.exit(1)

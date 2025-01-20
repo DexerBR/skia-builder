@@ -46,6 +46,7 @@ common_flags = {
 
 
 android_base_flags = {
+    **common_flags,
     # graphics backends
     "skia_use_gl": True,
     "skia_use_vulkan": True,
@@ -65,6 +66,7 @@ android_base_flags = {
 
 
 linux_base_flags = {
+    **common_flags,
     # graphics backends
     "skia_use_gl": True,
     "skia_use_vulkan": True,
@@ -80,6 +82,7 @@ linux_base_flags = {
 }
 
 macos_base_flags = {
+    **common_flags,
     # graphics backends
     "skia_use_gl": True,
     "skia_use_vulkan": False,
@@ -93,6 +96,7 @@ macos_base_flags = {
 }
 
 ios_base_flags = {
+    **common_flags,
     # graphics backends
     "skia_use_gl": True,
     "skia_use_vulkan": False,
@@ -107,6 +111,7 @@ ios_base_flags = {
 
 platform_specific_flags = {
     "windows-x64": {
+        **common_flags,
         # graphics backends
         "skia_use_gl": True,
         "skia_use_vulkan": True,
@@ -133,14 +138,12 @@ platform_specific_flags = {
         "skia_use_egl": True,
         "skia_gl_standard": "gles",
         "extra_cflags": [
-            *common_flags["extra_cflags"],
+            *linux_base_flags["extra_cflags"],
             "-fPIC",
-            # "--target=aarch64-linux-gnu",  # Target for ARM64 architecture (little-endian)
         ],
         "extra_cflags_cc": [
             *linux_base_flags["extra_cflags_cc"],
             "-fPIC",
-            # "--target=aarch64-linux-gnu",
         ],
     },
     # "linux-arm": {
@@ -189,8 +192,7 @@ platform_specific_flags = {
 
 
 def get_build_args(target_platform):
-    platform_flags = platform_specific_flags.get(target_platform, {})
-    flags = {**common_flags, **platform_flags}
+    flags = platform_specific_flags.get(target_platform, {})
 
     args_list = []
     for key, value in flags.items():

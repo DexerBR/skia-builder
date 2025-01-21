@@ -27,7 +27,7 @@ def get_supported_architectures(platform):
     return archs
 
 
-def setup_env(platform, sub_env=None):
+def setup_env(platform, sub_env=None, skip_llvm_instalation=False):
     PLATFORM_ENV_SETUP = {
         "Android": android.setup_env,
         "iOS": ios.setup_env,
@@ -42,7 +42,7 @@ def setup_env(platform, sub_env=None):
 
     if platform_env_setup:
         # Set up the main platform environment
-        platform_env_setup()
+        platform_env_setup(skip_llvm_instalation)
 
         # If a sub-environment is provided, set it up after the platform setup
         if sub_env:
@@ -97,6 +97,11 @@ def main():
         choices=["Android", "iOS", "iOSSimulator"],
         help="Sub-environment to configure (e.g., Android, iOS)",
     )
+    setup_env_parser.add_argument(
+        "--skip-llvm-instalation",
+        action="store_true",
+        help="Skip the installation of LLVM during environment setup",
+    )
     setup_env_parser.set_defaults(func=setup_env)
 
     # build subcommand
@@ -129,7 +134,7 @@ def main():
     current_platform = platform.system()
 
     if args.command == "setup-env":
-        setup_env(current_platform, args.sub_env)
+        setup_env(current_platform, args.sub_env, args.skip_llvm_instalation)
 
     elif args.command == "build":
         if not args.target_cpu:

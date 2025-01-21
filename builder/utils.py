@@ -37,8 +37,8 @@ class Logger:
         print(f"{Logger.GREEN}[INFO]{Logger.RESET} {message}", flush=True)
 
     @staticmethod
-    def warn(message):
-        print(f"{Logger.YELLOW}[WARN]{Logger.RESET} {message}", flush=True)
+    def warning(message):
+        print(f"{Logger.YELLOW}[WARNING]{Logger.RESET} {message}", flush=True)
 
     @staticmethod
     def error(message):
@@ -62,7 +62,7 @@ class Logger:
         print(formatted_message, flush=True)
 
 
-def run_command(command_list, step_description, cwd=None):
+def run_command(command_list, step_description, cwd=None, exit_on_error=True):
     Logger.custom(f"\n--- Running step: {step_description} ---", Logger.BRIGHT_YELLOW)
 
     process = None
@@ -129,9 +129,11 @@ def run_command(command_list, step_description, cwd=None):
         color = Logger.RED
     Logger.custom(message, color, bold=True)
 
-    if returncode != 0:
+    if returncode != 0 and exit_on_error:
         Logger.error(f"Exit code: {returncode}\n")
         sys.exit(returncode)
+
+    return returncode
 
 
 def get_files_with_extensions(directory, extensions):

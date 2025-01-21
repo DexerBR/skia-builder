@@ -2,6 +2,7 @@ import os
 
 from builder.config import get_build_args, parse_override_build_args
 from builder.utils import Logger, archive_build_output, run_command, store_includes
+from builder.versions import SKIA_VERSION
 
 
 def execute_build(
@@ -79,3 +80,64 @@ def execute_build(
             platform=platform,
             output_dir=output_dir,
         )
+
+
+def setup_env_common(install_skia_extra_dependencies=False):
+    """
+    Configures the Skia environment by cloning repositories, syncing dependencies,
+    and optionally installing additional dependencies (specific to Linux/Unix).
+
+    Args:
+        install_skia_extra_dependencies (bool): If True, installs extra dependencies
+        required for Skia, applicable primarily to Linux/Unix systems.
+    """
+    run_command(
+        [
+            "git",
+            "clone",
+            "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+        ],
+        "Cloning depot_tools",
+    )
+
+    run_command(
+        [os.path.join(os.getcwd(), "depot_tools", "gclient")],
+        "Verifying Depot Tools Installation",
+    )
+
+    run_command(
+        ["git", "clone", "https://skia.googlesource.com/skia.git"],
+        "Cloning Skia Repository",
+    )
+
+    skia_path = os.path.join(os.getcwd(), "skia")
+
+    run_command(
+        ["git", "fetch", "-v"],
+        "Fetching Skia Repository",
+        cwd=skia_path,
+    )
+    run_command(
+        ["git", "checkout", f"origin/chrome/{SKIA_VERSION}"],
+        f"Checking out Chrome/{SKIA_VERSION} branch",
+        cwd=skia_path,
+    )
+
+    if install_skia_extra_dependencies:
+        run_command(
+            [os.path.join(os.getcwd(), "skia", "tools", "install_dependencies.sh"), "-y"],
+            "Install Skia Extra Dependencies",
+            cwd=skia_path,
+        )
+
+    run_command(
+        ["python3", "tools/git-sync-deps"],
+        "Syncing Skia Dependencies",
+        cwd=skia_path,
+    )
+
+    run_command(
+        ["python3", "bin/fetch-ninja"],
+        "Fetching Ninja binary for Skia",
+        cwd=skia_path,
+    )

@@ -10,7 +10,6 @@ SUPPORTED_ARCHITECTURES = ("arm", "arm64", "x64", "x86")
 def setup_env():
     os.makedirs("Android_NDK", exist_ok=True)
 
-    # Download Android NDK
     run_command(
         [
             "curl",
@@ -21,7 +20,6 @@ def setup_env():
         "Downloading Android NDK",
     )
 
-    # Unzip Android NDK
     run_command(
         [
             "powershell",

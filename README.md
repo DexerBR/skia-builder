@@ -38,6 +38,17 @@ The `setup-env` command of `skia-builder` can be used to configure two types of 
 
 ***Note:*** The sub-environment configuration automatically sets up the main (host) environment.
 
+#### LLVM Installation
+
+LLVM is automatically installed on Linux and Windows platforms. However, the installation process varies between operating systems. Below are the detailed instructions for each platform:
+
+- **Linux**: LLVM is automatically installed via the *"Automatic installation script"*, available at [https://apt.llvm.org/](https://apt.llvm.org/).
+
+- **Windows**: On Windows, LLVM is installed via the Chocolatey package manager. Chocolatey is a requirement for LLVM installation. If the user does not have Chocolatey installed, it must be installed first, or the user can manually install LLVM from [https://github.com/llvm/llvm-project/releases](https://github.com/llvm/llvm-project/releases).
+
+- **macOS**: LLVM comes with Xcode on macOS, which can be installed via the App Store or from the Apple Developer website. The *Command Line Tools* may be insufficient for some advanced tasks.
+
+To disable the automatic installation of LLVM, see the example below.
 
 #### Examples:
 
@@ -47,11 +58,18 @@ Automatically detects the OS and architecture and configures the main environmen
 skia-builder setup-env
 ```
 
+If the user wants to manually manage the LLVM installation (or use a different compiler), they can pass the following argument when setting up the environment, which will skip the automatic LLVM installation:
+
+```
+skia-builder setup-env --skip_llvm_instalation
+```
+
 Does the same as the command above, and additionally configures the Android environment (only available on Windows):
 
 ```
 skia-builder setup-env --sub-env=Android
 ```
+
 
 <br>
 

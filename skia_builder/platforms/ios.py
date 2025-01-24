@@ -1,4 +1,4 @@
-from builder.platforms import execute_build
+from skia_builder.platforms import execute_build
 
 SUPPORTED_ARCHITECTURES = "arm64"
 

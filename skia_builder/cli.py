@@ -2,8 +2,8 @@ import platform
 import argparse
 import sys
 
-from builder.config import parse_custom_build_args
-from builder.platforms import (
+from skia_builder.config import parse_custom_build_args
+from skia_builder.platforms import (
     android,
     ios,
     iossimulator,
@@ -38,17 +38,17 @@ def setup_env(platform, sub_env=None, skip_llvm_instalation=False):
     }
 
     # Retrieve the setup action for the given platform
-    platform_env_setup = PLATFORM_ENV_SETUP.get(platform)
+    host_env_setup = PLATFORM_ENV_SETUP.get(platform)
 
-    if platform_env_setup:
+    if host_env_setup:
         # Set up the main platform environment
-        platform_env_setup(skip_llvm_instalation)
+        host_env_setup(skip_llvm_instalation)
 
         # If a sub-environment is provided, set it up after the platform setup
         if sub_env:
-            sub_env_action = platform_env_setup.get(sub_env)
-            if sub_env_action:
-                sub_env_action()  # Set up the sub-environment
+            sub_env_setup = PLATFORM_ENV_SETUP.get(sub_env)
+            if sub_env_setup:
+                sub_env_setup()  # Set up the sub-environment
             else:
                 print(f"Unknown sub-environment: {sub_env}")
                 sys.exit(1)

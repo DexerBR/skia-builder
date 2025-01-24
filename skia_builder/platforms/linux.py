@@ -1,5 +1,5 @@
-from builder.platforms import execute_build, setup_env_common
-from builder.utils import Logger, run_command
+from skia_builder.platforms import execute_build, setup_env_common
+from skia_builder.utils import Logger, run_command
 
 SUPPORTED_ARCHITECTURES = ("arm64", "x64")
 

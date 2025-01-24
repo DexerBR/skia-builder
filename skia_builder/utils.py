@@ -7,7 +7,7 @@ import tarfile
 import threading
 import platform
 
-from builder.config import DEFAULT_OUTPUT_DIR, INCLUDE_DIRS, bin_extensions_by_platform
+from skia_builder.config import DEFAULT_OUTPUT_DIR, INCLUDE_DIRS, bin_extensions_by_platform
 
 
 class Logger:

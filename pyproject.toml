@@ -20,22 +20,26 @@ requires-python = ">=3.11,<3.12"
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-#   "License :: OSI Approved :: LGPL-3.0 License",
+  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 keywords = ["skia", "tool", "cross-platform", "mobile", "desktop", "kivy"]
-dependencies = []
+
+
+[project.optional-dependencies]
+dev = ["ruff>=0.9.3"]
 
 
 [project.scripts]
-skia-builder = "builder.cli:main"
+skia-builder = "skia_builder.cli:main"
 
 
 [tool.setuptools]
-packages = ["builder"]
+packages = ["skia_builder"]
+package-data = { "skia_builder" = ["**/*"] }
 
 
 # [project.urls]

@@ -1,5 +1,5 @@
 import os
-from builder.versions import ANDROID_NDK
+from skia_builder.versions import ANDROID_NDK
 
 INCLUDE_DIRS = ["include", "modules", "src"]  # , "third_party"]
 DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), "output")

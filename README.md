@@ -96,11 +96,11 @@ The `skia-builder` also allows passing custom arguments for the Skia build flags
 ***Important:*** The usage logic of `"` and `'` must be implemented exactly as shown in the example below. Each flag definition should be separated by a space, and there should be no spaces within each flag definition.
 
 
-- 🟢 **Do:**`--custom-build-args="extra_cflags=['-g0']"`
+- 🟢 **Do:** `--custom-build-args="extra_cflags=['-g0']"`
 
 - 🔴 **Don't:** `--custom-build-args="extra_cflags =[ '-g0']"`
 
-- 🟢 **Do:**`--custom-build-args="extra_cflags=['-g0'] is_debug=false extra_cflags_cc=['-std=c++17'] ..."`
+- 🟢 **Do:** `--custom-build-args="extra_cflags=['-g0'] is_debug=false extra_cflags_cc=['-std=c++17'] ..."`
 
 - 🔴 **Don't:** `--custom-build-args="extra_cflags=[ '-g0'] is_debug =false  extra_cflags_cc=['-std=c++17' ] ..."`
 

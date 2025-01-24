@@ -3,7 +3,8 @@ name: Build Skia - Windows x64
 on:
   push:
     tags:
-      - 'v[0-9][0-9][0-9][0-9].[0-1][0-9].[0-3][0-9]*'
+      - '*'
+
 
 jobs:
   build-windows:

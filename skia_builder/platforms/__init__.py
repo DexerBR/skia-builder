@@ -1,8 +1,9 @@
 import os
+import platform
 
-from builder.config import get_build_args, parse_override_build_args
-from builder.utils import Logger, archive_build_output, run_command, store_includes
-from builder.versions import SKIA_VERSION
+from skia_builder.config import get_build_args, parse_override_build_args
+from skia_builder.utils import Logger, archive_build_output, run_command, store_includes
+from skia_builder.versions import SKIA_VERSION
 
 
 def execute_build(
@@ -100,8 +101,13 @@ def setup_env_common(install_skia_extra_dependencies=False):
         "Cloning depot_tools",
     )
 
+    gclient_executable = os.path.join(
+        os.getcwd(),
+        "depot_tools",
+        f"gclient{'.bat' if platform.system() == 'Windows' else ''}",
+    )
     run_command(
-        [os.path.join(os.getcwd(), "depot_tools", "gclient")],
+        [gclient_executable],
         "Verifying Depot Tools Installation",
     )
 

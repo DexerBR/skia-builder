@@ -1,8 +1,8 @@
 import os
 
-from builder.platforms import execute_build
-from builder.utils import run_command
-from builder.versions import ANDROID_NDK
+from skia_builder.platforms import execute_build
+from skia_builder.utils import run_command
+from skia_builder.versions import ANDROID_NDK
 
 SUPPORTED_ARCHITECTURES = ("arm", "arm64", "x64", "x86")
 

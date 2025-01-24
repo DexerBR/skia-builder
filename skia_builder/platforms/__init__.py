@@ -6,6 +6,26 @@ from skia_builder.utils import Logger, archive_build_output, run_command, store_
 from skia_builder.versions import SKIA_VERSION
 
 
+def get_executable_path(*path_parts, executable_name, windows_extension=None):
+    """
+    Builds a complete path for an executable, using the current working directory as the base.
+    Adds the specified extension only on Windows.
+
+    Args:
+        *path_parts: Variable-length list of path components (relative to the current directory).
+        executable_name: The name of the executable (without the extension).
+        windows_extension: Optional extension to add (e.g., '.exe', '.bat') on Windows.
+                           No extension is added for non-Windows platforms.
+
+    Returns:
+        str: The complete path to the executable, starting from the current working directory.
+    """
+    if platform.system() == "Windows" and windows_extension:
+        executable_name += windows_extension
+
+    return os.path.join(os.getcwd(), *path_parts, executable_name)
+
+
 def execute_build(
     target_cpu,
     platform,
@@ -42,16 +62,16 @@ def execute_build(
     if override_build_args:
         build_args = parse_override_build_args(build_args, override_build_args)
 
-    gn_executable = os.path.join(
-        os.getcwd(),
+    gn_executable = get_executable_path(
         "skia",
         "bin",
-        f"gn{'.exe' if platform == 'windows' else ''}",
+        executable_name="gn",
+        windows_extension=".exe",
     )
-    ninja_executable = os.path.join(
-        os.getcwd(),
+    ninja_executable = get_executable_path(
         "depot_tools",
-        f"ninja{'.bat' if platform == 'windows' else ''}",
+        executable_name="ninja",
+        windows_extension=".bat",
     )
 
     run_command(
@@ -78,7 +98,7 @@ def execute_build(
     if archive_output:
         archive_build_output(
             os.path.join(skia_path, "out", f"{build_target}"),
-            platform=platform,
+            platform,
             output_dir=output_dir,
         )
 
@@ -101,10 +121,10 @@ def setup_env_common(install_skia_extra_dependencies=False):
         "Cloning depot_tools",
     )
 
-    gclient_executable = os.path.join(
-        os.getcwd(),
+    gclient_executable = get_executable_path(
         "depot_tools",
-        f"gclient{'.bat' if platform.system() == 'Windows' else ''}",
+        executable_name="gclient",
+        windows_extension=".bat",
     )
     run_command(
         [gclient_executable],

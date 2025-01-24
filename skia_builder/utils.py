@@ -148,11 +148,28 @@ def get_files_with_extensions(directory, extensions):
     return matching_files
 
 
-def store_includes(skia_dir, output_dir=None):
+def _ensure_output_dir(output_dir):
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
-
     os.makedirs(output_dir, exist_ok=True)
+    return output_dir
+
+
+def store_skia_license(skia_dir, output_dir=None):
+    output_dir = _ensure_output_dir(output_dir)
+
+    src_license = os.path.join(skia_dir, "LICENSE")
+    dest_license = os.path.join(output_dir, "SKIA_LICENSE")
+
+    if os.path.exists(src_license):
+        shutil.copy(src_license, dest_license)
+        Logger.info(f"Copied LICENSE to {dest_license}")
+    else:
+        Logger.error(f"LICENSE file not found at {src_license}")
+
+
+def store_includes(skia_dir, output_dir=None):
+    output_dir = _ensure_output_dir(output_dir)
 
     for folder in INCLUDE_DIRS:
         src_folder = os.path.join(skia_dir, folder)
@@ -166,8 +183,7 @@ def store_includes(skia_dir, output_dir=None):
 
 
 def archive_build_output(build_input_src, target_platform, output_dir=None):
-    if output_dir is None:
-        output_dir = DEFAULT_OUTPUT_DIR
+    output_dir = _ensure_output_dir(output_dir)
 
     if not os.path.exists(build_input_src):
         Logger.error(
@@ -194,7 +210,6 @@ def archive_build_output(build_input_src, target_platform, output_dir=None):
     with tarfile.open(tar_path, "w:gz") as tar:
         for name in os.listdir(output_dir):
             full_path = os.path.join(output_dir, name)
-            if os.path.isdir(full_path):
-                tar.add(full_path, arcname=name)
+            tar.add(full_path, arcname=name)
 
     Logger.info(f"Build output archived to {tar_path}")

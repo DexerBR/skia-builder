@@ -13,76 +13,52 @@ from skia_builder.platforms import (
 )
 
 
-def get_supported_architectures(platform):
-    arch_map = {
-        "Android": android.SUPPORTED_ARCHITECTURES,
-        "iOS": ios.SUPPORTED_ARCHITECTURES,
-        "iOSSimulator": iossimulator.SUPPORTED_ARCHITECTURES,
-        "Linux": linux.SUPPORTED_ARCHITECTURES,
-        "macOS": macos.SUPPORTED_ARCHITECTURES,
-        "Windows": windows.SUPPORTED_ARCHITECTURES,
-    }
-
-    archs = arch_map.get(platform)
-    return archs
+PLATFORM_MANAGERS = {
+    "Android": android.AndroidPlatformManager,
+    "iOS": ios.IOSPlatformManager,
+    "iOSSimulator": iossimulator.IOSSimulatorPlatformManager,
+    "Linux": linux.LinuxPlatformManager,
+    "macOS": macos.MacOSPlatformManager,
+    "Windows": windows.WindowsPlatformManager,
+}
 
 
-def setup_env(platform, sub_env=None, skip_llvm_instalation=False):
-    PLATFORM_ENV_SETUP = {
-        "Android": android.setup_env,
-        "iOS": ios.setup_env,
-        "iOSSimulator": iossimulator.setup_env,
-        "Linux": linux.setup_env,
-        "macOS": macos.setup_env,
-        "Windows": windows.setup_env,
-    }
+def get_supported_architectures(target_platform):
+    manager = PLATFORM_MANAGERS.get(target_platform)
+    if manager is None:
+        raise ValueError(f"Unsupported platform: {target_platform}")
+    return manager.SUPPORTED_ARCHITECTURES
 
-    # Retrieve the setup action for the given platform
-    host_env_setup = PLATFORM_ENV_SETUP.get(platform)
 
-    if host_env_setup:
-        # Set up the main platform environment
-        host_env_setup(skip_llvm_instalation)
+def setup_env(host_platform, sub_env=None, skip_llvm_instalation=False):
+    # Use sub_env if provided, otherwise default to the detected platform
+    target_platform = sub_env if sub_env else host_platform
 
-        # If a sub-environment is provided, set it up after the platform setup
-        if sub_env:
-            sub_env_setup = PLATFORM_ENV_SETUP.get(sub_env)
-            if sub_env_setup:
-                sub_env_setup()  # Set up the sub-environment
-            else:
-                print(f"Unknown sub-environment: {sub_env}")
-                sys.exit(1)
-    else:
-        print(f"Unknown platform: {platform}")
+    manager = PLATFORM_MANAGERS.get(target_platform)
+    if manager is None:
+        print(f"Unsupported target platform: {target_platform}")
         sys.exit(1)
+
+    manager.setup_env(skip_llvm_instalation)
 
 
 def build(
-    platform,
+    host_platform,
     target_cpu,
     custom_build_args,
     override_build_args,
     archive_build_output,
     sub_env=None,
 ):
-    PLATFORM_BUILDERS = {
-        "Android": android.build,
-        "iOS": ios.build,
-        "iOSSimulator": iossimulator.build,
-        "Linux": linux.build,
-        "macOS": macos.build,
-        "Windows": windows.build,
-    }
-
     # Use sub_env if provided, otherwise default to the detected platform
-    target_platform = sub_env if sub_env else platform
+    target_platform = sub_env if sub_env else host_platform
 
-    platform_builder = PLATFORM_BUILDERS.get(target_platform)
-    if platform_builder:
-        platform_builder(target_cpu, custom_build_args, override_build_args, archive_build_output)
-    else:
-        print(f"Unknown platform: {target_platform}")
+    manager = PLATFORM_MANAGERS.get(target_platform)
+    if manager is None:
+        print(f"Unsupported target platform: {target_platform}")
         sys.exit(1)
+
+    manager.build(target_cpu, custom_build_args, override_build_args, archive_build_output)
 
 
 def main():
@@ -168,7 +144,7 @@ def main():
         )
 
     else:
-        print(f"Unknown command: {args.command}")
+        print(f"Unsupported command: {args.command}")
         sys.exit(1)
 
 

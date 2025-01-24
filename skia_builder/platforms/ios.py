@@ -1,11 +1,12 @@
-from skia_builder.platforms import execute_build
-
-SUPPORTED_ARCHITECTURES = "arm64"
+from skia_builder.platforms.common import CommonSubPlatformManager, SubPlatform
 
 
-def setup_env():
-    pass
-
-
-def build(target_cpu, custom_build_args=None, override_build_args=None, archive_output=False):
-    execute_build(target_cpu, "ios", custom_build_args, override_build_args, archive_output)
+class IOSPlatformManager(CommonSubPlatformManager):
+    HOST_PLATFORMS_ENV_SETUP = {
+        "Linux": None,
+        "Windows": None,
+        "macOS": CommonSubPlatformManager.noop,
+    }
+    TARGET_PLATFORM = SubPlatform.IOS
+    HOST_PLATFORM = TARGET_PLATFORM.host_platform
+    SUPPORTED_ARCHITECTURES = TARGET_PLATFORM.supported_architectures

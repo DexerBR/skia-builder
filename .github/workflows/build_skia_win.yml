@@ -1,4 +1,4 @@
-name: Build Skia - Windows x64
+name: Build Skia - Windows (x64)
 
 on:
   push:

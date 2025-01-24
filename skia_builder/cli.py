@@ -8,7 +8,7 @@ from skia_builder.platforms import (
     ios,
     iossimulator,
     linux,
-    darwin,
+    macos,
     windows,
 )
 
@@ -19,7 +19,7 @@ def get_supported_architectures(platform):
         "iOS": ios.SUPPORTED_ARCHITECTURES,
         "iOSSimulator": iossimulator.SUPPORTED_ARCHITECTURES,
         "Linux": linux.SUPPORTED_ARCHITECTURES,
-        "Darwin": darwin.SUPPORTED_ARCHITECTURES,
+        "macOS": macos.SUPPORTED_ARCHITECTURES,
         "Windows": windows.SUPPORTED_ARCHITECTURES,
     }
 
@@ -33,7 +33,7 @@ def setup_env(platform, sub_env=None, skip_llvm_instalation=False):
         "iOS": ios.setup_env,
         "iOSSimulator": iossimulator.setup_env,
         "Linux": linux.setup_env,
-        "Darwin": darwin.setup_env,
+        "macOS": macos.setup_env,
         "Windows": windows.setup_env,
     }
 
@@ -70,7 +70,7 @@ def build(
         "iOS": ios.build,
         "iOSSimulator": iossimulator.build,
         "Linux": linux.build,
-        "Darwin": darwin.build,
+        "macOS": macos.build,
         "Windows": windows.build,
     }
 
@@ -131,7 +131,7 @@ def main():
     build_parser.set_defaults(func=build)
 
     args = parser.parse_args()
-    current_platform = platform.system()
+    current_platform = "macOS" if platform.system() == "Darwin" else platform.system()
 
     if args.command == "setup-env":
         setup_env(current_platform, args.sub_env, args.skip_llvm_instalation)

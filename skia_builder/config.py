@@ -8,7 +8,7 @@ DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), "output")
 bin_extensions_by_platform = {
     "windows": ("lib", "dat"),
     "linux": ("a", "dat"),
-    "darwin": ("a", "dat"),
+    "macos": ("a", "dat"),
     "android": ("a", "dat"),
     "ios": ("a", "dat"),
     "iossimulator": ("a", "dat"),
@@ -18,7 +18,7 @@ bin_extensions_by_platform = {
 common_flags = {
     "extra_cflags": [
         "-g0"
-    ],  # Removes debug symbols from the binary to reduce its size (required for linux/darwin) - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
+    ],  # Removes debug symbols from the binary to reduce its size (required for linux/macos) - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
     "is_debug": False,
     "is_official_build": True,
     "is_component_build": False,

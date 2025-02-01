@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
-  
+
       - name: Set up python
         uses: actions/setup-python@v5.3.0
         with:
@@ -23,16 +23,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff
 
-      - name: Run Ruff format check
-        run: |
-          ruff check . --exit-zero
-        continue-on-error: true
-
-      - name: Check if Ruff found any issues
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Ruff found formatting issues. Please run ruff format."
-            exit 1
-          else
-            echo "No formatting issues detected."
-          fi
+      - name: Run Ruff check
+        run: ruff check .

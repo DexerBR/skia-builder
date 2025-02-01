@@ -1,16 +1,10 @@
-import platform
 import argparse
+import platform
 import sys
 
 from skia_builder.config import parse_custom_build_args
-from skia_builder.platforms import (
-    android,
-    ios,
-    iossimulator,
-    linux,
-    macos,
-    windows,
-)
+from skia_builder.platforms import android, ios, iossimulator, linux, macos, windows
+from skia_builder.utils import Logger
 
 
 PLATFORM_MANAGERS = {
@@ -36,7 +30,7 @@ def setup_env(host_platform, sub_env=None, skip_llvm_instalation=False):
 
     manager = PLATFORM_MANAGERS.get(target_platform)
     if manager is None:
-        print(f"Unsupported target platform: {target_platform}")
+        Logger.error(f"Unsupported target platform: {target_platform}")
         sys.exit(1)
 
     manager.setup_env(skip_llvm_instalation)
@@ -55,7 +49,7 @@ def build(
 
     manager = PLATFORM_MANAGERS.get(target_platform)
     if manager is None:
-        print(f"Unsupported target platform: {target_platform}")
+        Logger.error(f"Unsupported target platform: {target_platform}")
         sys.exit(1)
 
     manager.build(target_cpu, custom_build_args, override_build_args, archive_build_output)
@@ -98,7 +92,8 @@ def main():
         "--override-build-args",
         type=str,
         help=(
-            "Arguments to selectively override specific values in the default or custom build configuration"
+            "Arguments to selectively override specific values in the default or custom build "
+            "configuration"
         ),
     )
     build_parser.add_argument(
@@ -114,7 +109,7 @@ def main():
 
     elif args.command == "build":
         if not args.target_cpu:
-            print("Error: --target-cpu must be specified for the build command.")
+            Logger.error("Error: --target-cpu must be specified for the build command.")
             sys.exit(1)
 
         # Validate if target CPU is supported
@@ -122,9 +117,10 @@ def main():
             args.sub_env if args.sub_env else current_platform
         )
         if args.target_cpu not in supported_architectures:
-            print(
-                f"Unsupported CPU architecture for {args.sub_env or current_platform}: {args.target_cpu}. "
-                f"Supported architectures are: {', '.join(supported_architectures)}"
+            Logger.error(
+                f"Unsupported CPU architecture for {args.sub_env or current_platform}: "
+                f"{args.target_cpu}. Supported architectures are: "
+                f"{', '.join(supported_architectures)}"
             )
             sys.exit(1)
 
@@ -144,7 +140,7 @@ def main():
         )
 
     else:
-        print(f"Unsupported command: {args.command}")
+        Logger.error(f"Unsupported command: {args.command}")
         sys.exit(1)
 
 

@@ -5,7 +5,6 @@ import subprocess
 import sys
 import tarfile
 import threading
-import platform
 
 from skia_builder.config import DEFAULT_OUTPUT_DIR, INCLUDE_DIRS, bin_extensions_by_platform
 

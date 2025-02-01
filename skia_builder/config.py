@@ -16,9 +16,10 @@ bin_extensions_by_platform = {
 
 
 common_flags = {
-    "extra_cflags": [
-        "-g0"
-    ],  # Removes debug symbols from the binary to reduce its size (required for linux/macos) - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size | https://skia-review.googlesource.com/c/skia/+/892217
+    # Removes debug symbols from the binary to reduce its size (required for linux/macos)
+    # - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size
+    # | https://skia-review.googlesource.com/c/skia/+/892217
+    "extra_cflags": ["-g0"],
     "is_debug": False,
     "is_official_build": True,
     "is_component_build": False,

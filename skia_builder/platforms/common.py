@@ -115,8 +115,9 @@ class CommonPlatformManager:
 
     TARGET_PLATFORM = None
     """
-    The target platform for building Skia. Typically, it matches `HOST_PLATFORM` for Linux, Windows, and macOS,
-    but it can also take the following values depending on the availability of the host-to-sub-environment implementation:
+    The target platform for building Skia. Typically, it matches `HOST_PLATFORM` for Linux, Windows,
+    and macOS, but it can also take the following values depending on the availability of the
+    host-to-sub-environment implementation:
     - Platform.ANDROID
     - Platform.IOS
     - Platform.IOS_SIMULATOR
@@ -213,7 +214,8 @@ class CommonPlatformManager:
         Args:
             target_cpu (str): The target CPU architecture (e.g., "arm64", "x64").
             custom_build_args (str): Optional custom build flags.
-            override_build_args (str): Optional build flags that override the default or custom build flags.
+            override_build_args (str): Optional build flags that override the default or custom
+                build flags.
             archive_output (bool): Whether to archive the build output.
         """
         if not cls.TARGET_PLATFORM:
@@ -289,10 +291,11 @@ class CommonPlatformManager:
         Adds the specified extension only on Windows.
 
         Args:
-            *path_parts: Variable-length list of path components (relative to the current directory).
+            *path_parts: Variable-length list of path components (relative to the current
+                directory).
             executable_name: The name of the executable (without the extension).
             windows_extension: Optional extension to add (e.g., '.exe', '.bat') on Windows.
-                            No extension is added for non-Windows platforms.
+                No extension is added for non-Windows platforms.
 
         Returns:
             str: The complete path to the executable, starting from the current working directory.

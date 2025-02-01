@@ -27,7 +27,8 @@ class AndroidPlatformManager(CommonSubPlatformManager):
             [
                 "powershell",
                 "-Command",
-                f"Expand-Archive -Path 'Android_NDK/{ANDROID_NDK}-windows.zip' -DestinationPath 'Android_NDK'",
+                f"Expand-Archive -Path 'Android_NDK/{ANDROID_NDK}-windows.zip' "
+                "-DestinationPath 'Android_NDK'",
             ],
             "Extracting Android NDK",
         )

@@ -331,7 +331,7 @@ class CommonSubPlatformManager(CommonPlatformManager):
     HOST_PLATFORMS_ENV_SETUP = {}
 
     @staticmethod
-    def noop():
+    def noop(*args, **kwargs):
         """No-op method that performs no operation.
 
         This method is used as a placeholder for cases where a function is

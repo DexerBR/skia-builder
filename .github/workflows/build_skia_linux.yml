@@ -4,9 +4,18 @@ on:
   push:
     tags:
       - '*'
+  pull_request:
+    types: [opened, synchronize]
+
+concurrency:
+  group: build-linux-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-linux:
+    if: |
+      startsWith(github.ref, 'refs/tags/') ||
+      (contains(github.event.pull_request.labels.*.name, 'ci/build-binaries-linux'))
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -38,6 +47,14 @@ jobs:
     - name: Build skia for Linux
       run: |
         skia-builder build --target-cpu=${{ matrix.target_cpu }} --archive
+
+    - name: Upload artifacts
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: skia-artifacts-linux-${{ matrix.target_cpu }}
+        path: |
+          output/linux-${{ matrix.target_cpu }}/linux-${{ matrix.target_cpu }}.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')

@@ -4,10 +4,18 @@ on:
   push:
     tags:
       - '*'
+  pull_request:
+    types: [opened, synchronize]
 
+concurrency:
+  group: build-windows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-windows:
+    if: |
+      startsWith(github.ref, 'refs/tags/') ||
+      (contains(github.event.pull_request.labels.*.name, 'ci/build-binaries-windows'))
     runs-on: windows-latest
 
     permissions:
@@ -34,12 +42,13 @@ jobs:
       run: |
         skia-builder build --target-cpu=x64 --archive
 
-    # - name: Upload artifacts
-    #   uses: actions/upload-artifact@v4.4.3
-    #   with:
-    #     name: skia-artifacts
-    #     path: |
-    #       output/windows-x64/windows-x64.tar.gz
+    - name: Upload artifacts
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: skia-artifacts-windows
+        path: |
+          output/windows-x64/windows-x64.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')

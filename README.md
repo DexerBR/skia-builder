@@ -110,6 +110,27 @@ skia-builder build --sub-env=Android --target-cpu=arm64 --custom-build-args="ext
 
 <br>
 
+### Build workflows and binary generation
+
+This repository uses GitHub Actions to automatically build Skia binaries for **Windows**, **macOS**, **Linux**, **iOS**, **iOS Simulator**, and **Android** under the following conditions:  
+
+#### Triggers:  
+- **Tags**: Pushing a tag (e.g., `v1.0.0`) triggers builds for all platforms.  
+- **Pull Requests**:  
+  - Opened or updated PRs trigger builds **only if labeled** with:  
+    - `ci/build-binaries-windows` for Windows binaries.  
+    - `ci/build-binaries-macos` for macOS binaries.  
+    - `ci/build-binaries-linux` for Linux binaries.  
+    - `ci/build-binaries-ios-simulator` for iOS Simulator binaries.  
+    - `ci/build-binaries-ios` for iOS binaries.  
+    - `ci/build-binaries-android` for Android binaries.  
+
+#### Concurrency Control:  
+- Only the **latest** build for a specific PR or tag will run.  
+- Previous queued or in-progress builds for the same PR or tag are automatically **canceled** to prioritize the most recent changes.  
+
+<br>
+
 ### General Notes
 For macOS, we assume the built library will be used in an application that uses ANGLE as a GL provider. As a result, we force the `skia_gl_standard` setting to `"gles"`, since Skia cannot accurately detect the OpenGL version when running with ANGLE on macOS.
 

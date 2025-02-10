@@ -370,7 +370,6 @@ class CommonSubPlatformManager(CommonPlatformManager):
         cls._validate_host_platform()
         setup_env_host = cls._get_host_setup_env()
         setup_env_host(skip_llvm_instalation)
-        cls._setup_env()
 
     @classmethod
     def build(

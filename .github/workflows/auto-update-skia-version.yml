@@ -1,0 +1,40 @@
+name: Update Skia Version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+env:
+  SKIA_VERSION: ""
+
+jobs:
+  update-skia-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run update script
+        run: |
+          python -c "from skia_builder.utils import check_update_skia_version; check_update_skia_version()"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Update Skia version to `${{ env.SKIA_VERSION }}`"
+          body: "This PR updates the Skia version to the latest stable release."
+          base: main
+          draft: false
+          commit-message: "update skia version"
+          branch: "update-skia-version"
+          labels: "ci/build-binaries-linux, ci/build-binaries-macos, ci/build-binaries-windows, ci/build-binaries-android, ci/build-binaries-ios, ci/build-binaries-ios-simulator"
+          # reviewers: "DexerBR, misl6"

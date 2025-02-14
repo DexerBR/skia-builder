@@ -1,10 +1,15 @@
+import json
 import os
+import re
 import shutil
 import signal
 import subprocess
 import sys
 import tarfile
 import threading
+from pathlib import Path
+from urllib.error import URLError
+from urllib.request import urlopen
 
 from skia_builder.config import DEFAULT_OUTPUT_DIR, INCLUDE_DIRS, bin_extensions_by_platform
 
@@ -212,3 +217,115 @@ def archive_build_output(build_input_src, target_platform, output_dir=None):
             tar.add(full_path, arcname=name)
 
     Logger.info(f"Build output archived to {tar_path}")
+
+
+def check_update_skia_version():
+    chromium_url = (
+        "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Windows&num=1"
+    )
+    release_notes_url = "https://raw.githubusercontent.com/google/skia/main/RELEASE_NOTES.md"
+    versions_file = "versions.py"
+    readme_file = "README.md"
+
+    # Fetch Chromium dash data and extract the milestone
+    try:
+        with urlopen(chromium_url) as response:
+            if response.status != 200:
+                raise URLError(f"HTTP Status {response.status}")
+            data = json.load(response)
+    except URLError as e:
+        Logger.error(f"Failed to fetch Chromium release data from {chromium_url}. Error: {e}")
+        sys.exit(1)
+
+    try:
+        milestone = data[0]["milestone"]
+    except (IndexError, KeyError):
+        Logger.error("Unexpected format when extracting the milestone from the fetched data.")
+        sys.exit(1)
+
+    # Fetch Skia release notes
+    try:
+        with urlopen(release_notes_url) as response:
+            if response.status != 200:
+                raise URLError(f"HTTP Status {response.status}")
+            release_notes = response.read().decode("utf-8")
+    except URLError as e:
+        Logger.error(f"Failed to fetch Skia release notes from {release_notes_url}. Error: {e}")
+        sys.exit(1)
+
+    milestone_pattern = f"Milestone {milestone}"
+    if milestone_pattern not in release_notes:
+        Logger.info(
+            f"No new stable Skia milestone found (expected {milestone}). "
+            "Skia update is not required."
+        )
+        sys.exit(0)
+
+    Logger.info(
+        f"Found new Skia stable milestone {milestone}. "
+        f"Proceeding with updates to {versions_file} and {readme_file}."
+    )
+
+    versions_file_path = Path(__file__).parent / versions_file
+    readme_file_path = Path(__file__).parent.parent / readme_file
+
+    if not versions_file_path.exists():
+        Logger.error(f"{versions_file} not found in the expected location. Update cannot proceed.")
+        sys.exit(1)
+
+    try:
+        content = versions_file_path.read_text(encoding="utf-8")
+    except Exception as e:
+        Logger.error(f"Error reading {versions_file}: {e}. Unable to proceed with version update.")
+        sys.exit(1)
+
+    # Updating version in versions.py
+    new_content, num_subs = re.subn(
+        r'SKIA_VERSION = "m\d+"', f'SKIA_VERSION = "m{milestone}"', content
+    )
+
+    if num_subs == 0:
+        Logger.warning(f"No SKIA_VERSION entry found in {versions_file} to update.")
+    else:
+        try:
+            versions_file_path.write_text(new_content, encoding="utf-8")
+            Logger.info(
+                f"Successfully updated {versions_file}: Set SKIA_VERSION to 'm{milestone}'."
+            )
+        except Exception as e:
+            Logger.error(
+                f"Error writing to {versions_file}: {e}. Update of {versions_file} failed."
+            )
+            sys.exit(1)
+
+    # Updating README.md
+    try:
+        readme_content = readme_file_path.read_text(encoding="utf-8")
+    except Exception as e:
+        Logger.error(f"Error reading {readme_file}: {e}. Unable to proceed with README update.")
+        sys.exit(1)
+
+    # Replacing version in the badge
+    new_readme_content, readme_subs = re.subn(
+        r"!\[SKIA_VERSION\]\(https://img.shields.io/badge/Skia_version-m\d+-blue\?style=flat-square\)",
+        f"![SKIA_VERSION](https://img.shields.io/badge/Skia_version-m{milestone}-blue?style=flat-square)",
+        readme_content,
+    )
+
+    if readme_subs == 0:
+        Logger.warning(f"No SKIA_VERSION badge found in {readme_file} to update.")
+    else:
+        try:
+            readme_file_path.write_text(new_readme_content, encoding="utf-8")
+            Logger.info(
+                f"Successfully updated {readme_file}: Updated SKIA_VERSION badge to 'm{milestone}'."
+            )
+        except Exception as e:
+            Logger.error(f"Error writing to {readme_file}: {e}. Update of {readme_file} failed.")
+            sys.exit(1)
+
+    # NOTE: In GitHub Actions, this code appends SKIA_VERSION to the env file for later steps.
+    github_env_file = os.getenv("GITHUB_ENV")
+    if github_env_file:
+        with open(github_env_file, "a") as env_file:
+            env_file.write(f"SKIA_VERSION=m{milestone}\n")

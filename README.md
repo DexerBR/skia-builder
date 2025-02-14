@@ -5,6 +5,18 @@
 
 ## Supported platforms, architectures, and environments in `skia-builder`
 
+[![PyPI - Version](https://img.shields.io/pypi/v/skia-builder?style=flat-square&color=blue)](https://pypi.org/project/skia-builder/)
+
+![SKIA_VERSION](https://img.shields.io/badge/Skia_version-m131-blue?style=flat-square)
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_linux.yml?event=push&style=flat-square&label=Linux%20build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_macos.yml?event=push&style=flat-square&label=macOS%20build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_windows.yml?event=push&style=flat-square&label=Windows%20build)
+<br>
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_android.yml?event=push&style=flat-square&label=Android%20build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_ios.yml?event=push&style=flat-square&label=iOS%20build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_iossimulator.yml?event=push&style=flat-square&label=iOS%20Simulator%20build)
+
 Platforms and architectures currently supported:
 
 
@@ -136,3 +148,12 @@ For macOS, we assume the built library will be used in an application that uses 
 
 If you intend to use Skia in an environment that does not rely on GLES (e.g., standard macOS OpenGL), you can override this default by passing
 `skia_gl_standard` to `--override-build-args` with the desired value, for example, `--override-build-args="skia_gl_standard='gl'"` (for the default macOS OpenGL).
+
+<br>
+
+## License
+
+This project is licensed under the terms of the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.html).
+
+> **Note:**  
+> This repository includes the full texts of both the GNU GPL v3.0 and the GNU LGPL v3.0. The GPL v3.0 serves as the base for the LGPL v3.0, but the applicable license for this project is **LGPL v3.0**. For more details, see the `COPYING` and `COPYING.LESSER` files.

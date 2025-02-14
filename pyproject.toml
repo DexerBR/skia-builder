@@ -12,7 +12,7 @@ skip = ["*-musllinux*", "pp*", "*-win32"]
 
 [project]
 name = "skia-builder"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Cross-platform tool for Skia environment setup and binary generation"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
@@ -20,13 +20,17 @@ authors = [{ name = "DexerBR", email = "73297572+DexerBR@users.noreply.github.co
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
+  "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 keywords = ["skia", "tool", "cross-platform", "mobile", "desktop", "kivy"]
+
+
+[tool.setuptools.dynamic]
+version = { attr = "skia_builder.__init__.__version__" }
 
 
 [project.optional-dependencies]
@@ -42,9 +46,9 @@ packages = ["skia_builder"]
 package-data = { "skia_builder" = ["**/*"] }
 
 
-# [project.urls]
-# "Homepage" = "https://github.com/DexerBR/skia-builder"
-# "Bug Reports" = "https://github.com/DexerBR/skia-builder/issues"
+[project.urls]
+"Homepage" = "https://github.com/DexerBR/skia-builder"
+"Bug Reports" = "https://github.com/DexerBR/skia-builder/issues"
 
 
 [tool.ruff]

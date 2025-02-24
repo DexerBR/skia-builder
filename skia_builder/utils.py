@@ -274,21 +274,21 @@ def check_update_skia_version():
         sys.exit(1)
 
     try:
-        content = versions_file_path.read_text(encoding="utf-8")
+        versions_content = versions_file_path.read_text(encoding="utf-8")
     except Exception as e:
         Logger.error(f"Error reading {versions_file}: {e}. Unable to proceed with version update.")
         sys.exit(1)
 
     # Updating version in versions.py
-    new_content, num_subs = re.subn(
-        r'SKIA_VERSION = "m\d+"', f'SKIA_VERSION = "m{milestone}"', content
+    new_versions_content, _ = re.subn(
+        r'SKIA_VERSION = "m\d+"', f'SKIA_VERSION = "m{milestone}"', versions_content
     )
 
-    if num_subs == 0:
+    if versions_content == new_versions_content:
         Logger.warning(f"No SKIA_VERSION entry found in {versions_file} to update.")
     else:
         try:
-            versions_file_path.write_text(new_content, encoding="utf-8")
+            versions_file_path.write_text(new_versions_content, encoding="utf-8")
             Logger.info(
                 f"Successfully updated {versions_file}: Set SKIA_VERSION to 'm{milestone}'."
             )
@@ -306,13 +306,13 @@ def check_update_skia_version():
         sys.exit(1)
 
     # Replacing version in the badge
-    new_readme_content, readme_subs = re.subn(
+    new_readme_content, _ = re.subn(
         r"!\[SKIA_VERSION\]\(https://img.shields.io/badge/Skia_version-m\d+-blue\?style=flat-square\)",
         f"![SKIA_VERSION](https://img.shields.io/badge/Skia_version-m{milestone}-blue?style=flat-square)",
         readme_content,
     )
 
-    if readme_subs == 0:
+    if readme_content == new_readme_content:
         Logger.warning(f"No SKIA_VERSION badge found in {readme_file} to update.")
     else:
         try:
@@ -324,8 +324,11 @@ def check_update_skia_version():
             Logger.error(f"Error writing to {readme_file}: {e}. Update of {readme_file} failed.")
             sys.exit(1)
 
-    # NOTE: In GitHub Actions, this code appends SKIA_VERSION to the env file for later steps.
+    # NOTE: In GitHub Actions, this code appends NEW_SKIA_VERSION to the env file for later steps.
     github_env_file = os.getenv("GITHUB_ENV")
     if github_env_file:
         with open(github_env_file, "a") as env_file:
-            env_file.write(f"SKIA_VERSION=m{milestone}\n")
+            if versions_content != new_versions_content and readme_content != new_readme_content:
+                env_file.write(f"NEW_SKIA_VERSION=m{milestone}\n")
+            else:
+                env_file.write("NEW_SKIA_VERSION=''\n")

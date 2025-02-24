@@ -32,7 +32,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           title: "Update Skia version to `${{ env.NEW_SKIA_VERSION }}`"
-          body: "This PR updates the Skia version to the latest stable release."
+          body: "This PR updates the Skia version to the latest stable release.\n#### References:\n- https://chromiumdash.appspot.com/branches \n- https://github.com/google/skia/blob/main/RELEASE_NOTES.md"
           base: main
           draft: false
           commit-message: "update skia version"

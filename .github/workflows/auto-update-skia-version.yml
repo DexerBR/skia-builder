@@ -32,7 +32,27 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           title: "Update Skia version to `${{ env.NEW_SKIA_VERSION }}`"
-          body: "This PR updates the Skia version to the latest stable release.\n#### References:\n- https://chromiumdash.appspot.com/branches \n- https://github.com/google/skia/blob/main/RELEASE_NOTES.md"
+          body: |
+            This PR updates the Skia version to the latest stable release.
+
+            ### 📚 References:
+            - https://chromiumdash.appspot.com/branches
+            - https://github.com/google/skia/blob/main/RELEASE_NOTES.md
+
+            ---
+
+            ### ⚠️ Manual Builds (must be triggered **before merging**)
+            Please manually trigger the platform-specific builds from [GitHub Actions](https://github.com/${{ github.repository }}/actions) **before merging this PR**.
+            
+            🚧 Make sure to run these builds using the branch `update-skia-version`:
+
+            - 📱 [Build Skia - Android (arm, arm64, x64, x86)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_android.yml)
+            - 📱 [Build Skia - iOS (arm64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_ios.yml)
+            - 🖥️ [Build Skia - iOS Simulator (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_iossimulator.yml)
+            - 💻 [Build Skia - Linux (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_linux.yml)
+            - 💻 [Build Skia - macOS (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_macos.yml)
+            - 💻 [Build Skia - Windows (x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_windows.yml)
+
           base: main
           draft: false
           commit-message: "update skia version"

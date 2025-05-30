@@ -1,6 +1,7 @@
 name: Build Skia - Android (arm, arm64, x64, x86)
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'

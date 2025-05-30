@@ -1,6 +1,7 @@
 name: Build Skia - Linux (arm64, x64)
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'

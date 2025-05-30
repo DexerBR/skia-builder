@@ -1,6 +1,7 @@
 name: Build Skia - iOS (arm64)
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'

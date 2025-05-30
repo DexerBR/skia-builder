@@ -57,5 +57,5 @@ jobs:
           draft: false
           commit-message: "update skia version"
           branch: "update-skia-version"
-          labels: "ci/build-binaries-linux, ci/build-binaries-macos, ci/build-binaries-windows, ci/build-binaries-android, ci/build-binaries-ios, ci/build-binaries-ios-simulator"
+          labels: "skia-version-update"
           reviewers: "DexerBR, misl6"

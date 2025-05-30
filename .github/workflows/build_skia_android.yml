@@ -15,6 +15,7 @@ concurrency:
 jobs:
   build-android:
     if: |
+      github.event_name == 'workflow_dispatch' ||
       startsWith(github.ref, 'refs/tags/') ||
       (contains(github.event.pull_request.labels.*.name, 'ci/build-binaries-android'))
     runs-on: windows-latest

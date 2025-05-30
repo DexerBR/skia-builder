@@ -41,21 +41,21 @@ jobs:
 
             ---
 
-            ### ⚠️ Manual Builds (must be triggered **before merging**)
-            Please manually trigger the platform-specific builds from [GitHub Actions](https://github.com/${{ github.repository }}/actions) **before merging this PR**.
-            
-            🚧 Make sure to run these builds using the branch `update-skia-version`:
+            ### 🔁 Triggering Workflows
 
-            - 📱 [Build Skia - Android (arm, arm64, x64, x86)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_android.yml)
-            - 📱 [Build Skia - iOS (arm64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_ios.yml)
-            - 🖥️ [Build Skia - iOS Simulator (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_iossimulator.yml)
-            - 💻 [Build Skia - Linux (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_linux.yml)
-            - 💻 [Build Skia - macOS (arm64, x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_macos.yml)
-            - 💻 [Build Skia - Windows (x64)](https://github.com/${{ github.repository }}/actions/workflows/build_skia_windows.yml)
+            If a workflow did not run or needs to be executed again, you can re-trigger it using **either** of the following methods:
+
+            - **Manually** from the **Checks** tab of this pull request by clicking **"Re-run jobs"**.
+            - **Push an empty commit** to this branch to re-evaluate workflow conditions:
+
+              ```bash
+              git commit --allow-empty -m "trigger workflow"
+              git push
+              ```
 
           base: main
           draft: false
           commit-message: "update skia version"
           branch: "update-skia-version"
-          labels: "skia-version-update"
+          labels: "ci/build-binaries-linux, ci/build-binaries-macos, ci/build-binaries-windows, ci/build-binaries-android, ci/build-binaries-ios, ci/build-binaries-ios-simulator, skia-version-update"
           reviewers: "DexerBR, misl6"

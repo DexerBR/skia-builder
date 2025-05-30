@@ -1,7 +1,6 @@
 name: Build Skia - iOS Simulator (arm64, x64)
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - '*'
@@ -15,9 +14,8 @@ concurrency:
 jobs:
   build-iossimulator:
     if: |
-      github.event_name == 'workflow_dispatch' ||
       startsWith(github.ref, 'refs/tags/') ||
-      (contains(github.event.pull_request.labels.*.name, 'ci/build-binaries-ios-simulator'))
+      (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'ci/build-binaries-ios-simulator'))
     runs-on: macos-latest
 
     permissions:

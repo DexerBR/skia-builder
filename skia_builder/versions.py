@@ -1,2 +1,2 @@
 ANDROID_NDK = "android-ndk-r27c"
-SKIA_VERSION = "m137"
+SKIA_VERSION = "m138"

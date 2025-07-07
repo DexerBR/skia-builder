@@ -108,6 +108,8 @@ ios_base_flags = {
     # build env configs
     "target_os": "ios",
     "ios_min_target": "13.0",
+    "skia_enable_pdf": False,
+    "skia_use_expat": False,
 }
 
 platform_specific_flags = {

@@ -1,5 +1,6 @@
 import os
 import platform
+import shutil
 import sys
 from enum import Enum
 
@@ -235,6 +236,16 @@ class CommonPlatformManager:
         skia_path = os.path.join(os.getcwd(), "skia")
         build_target = f"{platform}-{target_cpu}"
         output_dir = os.path.join("output", build_target)
+
+        if os.path.exists(output_dir):
+            Logger.warning(f"The directory '{output_dir}' already exists.")
+            response = input("Do you want to overwrite it? [y/N]: ").strip().lower()
+            if response == "y":
+                shutil.rmtree(output_dir)
+                Logger.info(f"Directory '{output_dir}' has been removed. Continuing execution...")
+            else:
+                Logger.warning("Exiting without changes.")
+                exit(1)
 
         if archive_output:
             store_skia_license(skia_path, output_dir=output_dir)

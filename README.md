@@ -73,7 +73,7 @@ skia-builder setup-env
 If the user wants to manually manage the LLVM installation (or use a different compiler), they can pass the following argument when setting up the environment, which will skip the automatic LLVM installation:
 
 ```
-skia-builder setup-env --skip_llvm_instalation
+skia-builder setup-env --skip-llvm-instalation
 ```
 
 Does the same as the command above, and additionally configures the Android environment (only available on Windows):

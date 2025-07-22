@@ -58,7 +58,7 @@ android_base_flags = {
     **common_flags,
     # graphics backends
     "skia_use_gl": True,
-    "skia_use_vulkan": True,
+    "skia_use_vulkan": False,
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
@@ -78,7 +78,7 @@ linux_base_flags = {
     **common_flags,
     # graphics backends
     "skia_use_gl": True,
-    "skia_use_vulkan": True,
+    "skia_use_vulkan": False,
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
@@ -98,7 +98,7 @@ macos_base_flags = {
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
-    "skia_use_metal": True,
+    "skia_use_metal": False,
     # build env configs
     "target_os": "mac",
     "skia_gl_standard": "gles",
@@ -112,7 +112,7 @@ ios_base_flags = {
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
-    "skia_use_metal": True,
+    "skia_use_metal": False,
     # build env configs
     "target_os": "ios",
     "ios_min_target": "13.0",

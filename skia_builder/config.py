@@ -113,7 +113,7 @@ ios_base_flags = {
     "skia_use_angle": False,
     "skia_use_dawn": False,
     "skia_use_metal": False,
-    # build env configs
+    # build env config
     "target_os": "ios",
     "ios_min_target": "13.0",
     "skia_enable_pdf": False,

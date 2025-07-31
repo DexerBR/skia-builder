@@ -80,7 +80,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4.4.3
         with:
-          name: skia-artifacts-ios
+          name: skia-artifacts-ios-merged
           path: output/ios-merged.tar.gz
       - name: Upload artifacts to release
         if: startsWith(github.ref, 'refs/tags/')

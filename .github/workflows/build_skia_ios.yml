@@ -60,15 +60,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4.3.0
         with:
-          name: ios-arm64
+          name: skia-artifacts-ios-arm64
           path: output/ios-arm64
       - uses: actions/download-artifact@v4.3.0
         with:
-          name: iossimulator-arm64
+          name: skia-artifacts-iossimulator-arm64
           path: output/iossimulator-arm64
       - uses: actions/download-artifact@v4.3.0
         with:
-          name: iossimulator-x64
+          name: skia-artifacts-iossimulator-x64
           path: output/iossimulator-x64
       - run: |
           mkdir -p output/ios-merged

@@ -12,63 +12,80 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-ios:
+  build-ios-all:
     if: |
       startsWith(github.ref, 'refs/tags/') ||
       (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'ci/build-binaries-ios'))
     runs-on: macos-latest
-
-    permissions:
-      contents: write
-
+    strategy:
+      matrix:
+        include:
+          - target_cpu: arm64
+            sub_env: iOS
+            artifact_prefix: ios-arm64
+          - target_cpu: arm64
+            sub_env: iOSSimulator
+            artifact_prefix: iossimulator-arm64
+          - target_cpu: x64
+            sub_env: iOSSimulator
+            artifact_prefix: iossimulator-x64
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
 
-    - name: Set up python
-      uses: actions/setup-python@v5.3.0
-      with:
-        python-version: '3.11'
+      - name: Set up python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: '3.11'
 
-    - name: Install skia-builder
-      run: |
-        pip install .
+      - name: Install skia-builder
+        run: |
+          pip install .
 
-    - name: Setup skia environment for iOS and iOS Simulator
-      run: |
-        skia-builder setup-env --sub-env=iOS
-        skia-builder setup-env --sub-env=iOSSimulator
+      - name: Setup skia environment for ${{ matrix.sub_env }}
+        run: skia-builder setup-env --sub-env=${{ matrix.sub_env }}
+      
+      - name: Build skia for ${{ matrix.sub_env }}
+        run: skia-builder build --sub-env=${{ matrix.sub_env }} --target-cpu=${{ matrix.target_cpu}} --archive
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: skia-artifacts-${{ matrix.artifact_prefix }}
+          path: output/${{ matrix.artifact_prefix }}/${{ matrix.artifact_prefix }}.tar.gz
 
-    - name: Build skia for iOS
-      run: |
-        skia-builder build --sub-env=iOS --target-cpu=arm64 --archive
-
-    - name: Build skia for iOS Simulator
-      run: |
-        skia-builder build --sub-env=iOSSimulator --target-cpu=arm64 --archive
-        skia-builder build --sub-env=iOSSimulator --target-cpu=x64 --archive
-
-    - name: Merge iOS and iOS Simulator artifacts
-      run: |
-        mkdir -p output/ios-merged
-        cp -r output/ios-arm64/ios-arm64.tar.gz output/ios-merged/
-        cp -r output/iossimulator-arm64/iossimulator-arm64.tar.gz output/ios-merged/
-        cp -r output/iossimulator-x64/iossimulator-x64.tar.gz output/ios-merged/
-        tar -czf output/ios-merged.tar.gz -C output/ios-merged
-
-    - name: Upload artifacts
-      if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4.4.3
-      with:
-        name: skia-artifacts-ios
-        path: |
-          output/ios-merged.tar.gz
-
-    - name: Upload artifacts to release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2.2.1
-      with:
-        name: ${{ github.ref_name }}
-        files: |
-          output/ios-merged.tar.gz
-        draft: true
+  merge-artifacts:
+    needs: [build-ios-all]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: ios-arm64
+          path: output/ios-arm64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: iossimulator-arm64
+          path: output/iossimulator-arm64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: iossimulator-x64
+          path: output/iossimulator-x64
+      - run: |
+          mkdir -p output/ios-merged
+          cp output/ios-arm64/ios-arm64.tar.gz output/ios-merged/
+          cp output/iossimulator-arm64/iossimulator-arm64.tar.gz output/ios-merged/
+          cp output/iossimulator-x64/iossimulator-x64.tar.gz output/ios-merged/
+          tar -czf output/ios-merged.tar.gz -C output/ios-merged .
+      - name: Upload artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: skia-artifacts-ios
+          path: output/ios-merged.tar.gz
+      - name: Upload artifacts to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          name: ${{ github.ref_name }}
+          files: output/ios-merged.tar.gz
+          draft: true

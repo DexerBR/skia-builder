@@ -34,13 +34,27 @@ jobs:
       run: |
         pip install .
 
-    - name: Setup skia environment for iOS
+    - name: Setup skia environment for iOS and iOS Simulator
       run: |
         skia-builder setup-env --sub-env=iOS
+        skia-builder setup-env --sub-env=iOSSimulator
 
     - name: Build skia for iOS
       run: |
         skia-builder build --sub-env=iOS --target-cpu=arm64 --archive
+
+    - name: Build skia for iOS Simulator
+      run: |
+        skia-builder build --sub-env=iOSSimulator --target-cpu=arm64 --archive
+        skia-builder build --sub-env=iOSSimulator --target-cpu=x64 --archive
+
+    - name: Merge iOS and iOS Simulator artifacts
+      run: |
+        mkdir -p output/ios-merged
+        cp -r output/ios-arm64/ios-arm64.tar.gz output/ios-merged/
+        cp -r output/iossimulator-arm64/iossimulator-arm64.tar.gz output/ios-merged/
+        cp -r output/iossimulator-x64/iossimulator-x64.tar.gz output/ios-merged/
+        tar -czf output/ios-merged.tar.gz -C output/ios-merged
 
     - name: Upload artifacts
       if: github.event_name == 'pull_request'
@@ -48,7 +62,7 @@ jobs:
       with:
         name: skia-artifacts-ios
         path: |
-          output/ios-arm64/ios-arm64.tar.gz
+          output/ios-merged.tar.gz
 
     - name: Upload artifacts to release
       if: startsWith(github.ref, 'refs/tags/')
@@ -56,5 +70,5 @@ jobs:
       with:
         name: ${{ github.ref_name }}
         files: |
-          output/ios-arm64/ios-arm64.tar.gz
+          output/ios-merged.tar.gz
         draft: true

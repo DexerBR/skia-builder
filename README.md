@@ -15,7 +15,7 @@
 <br>
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_android.yml?event=push&style=flat-square&label=Android%20build)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_ios.yml?event=push&style=flat-square&label=iOS%20build)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_iossimulator.yml?event=push&style=flat-square&label=iOS%20Simulator%20build)
+
 
 Platforms and architectures currently supported:
 
@@ -124,7 +124,7 @@ skia-builder build --sub-env=Android --target-cpu=arm64 --custom-build-args="ext
 
 ### Build workflows and binary generation
 
-This repository uses GitHub Actions to automatically build Skia binaries for **Windows**, **macOS**, **Linux**, **iOS**, **iOS Simulator**, and **Android** under the following conditions:  
+This repository uses GitHub Actions to automatically build Skia binaries for **Windows**, **macOS**, **Linux**, **iOS**/**iOS Simulator**, and **Android** under the following conditions:  
 
 #### Triggers:  
 - **Tags**: Pushing a tag (e.g., `v1.0.0`) triggers builds for all platforms.  
@@ -133,8 +133,7 @@ This repository uses GitHub Actions to automatically build Skia binaries for **W
     - `ci/build-binaries-windows` for Windows binaries.  
     - `ci/build-binaries-macos` for macOS binaries.  
     - `ci/build-binaries-linux` for Linux binaries.  
-    - `ci/build-binaries-ios-simulator` for iOS Simulator binaries.  
-    - `ci/build-binaries-ios` for iOS binaries.  
+    - `ci/build-binaries-ios` for iOS/iOS Simulator binaries.  
     - `ci/build-binaries-android` for Android binaries.  
 
 #### Concurrency Control:  

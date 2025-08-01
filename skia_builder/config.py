@@ -98,7 +98,7 @@ macos_base_flags = {
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
-    "skia_use_metal": False,
+    "skia_use_metal": True,
     # build env configs
     "target_os": "mac",
     "skia_gl_standard": "gles",
@@ -112,7 +112,7 @@ ios_base_flags = {
     "skia_use_direct3d": False,
     "skia_use_angle": False,
     "skia_use_dawn": False,
-    "skia_use_metal": False,
+    "skia_use_metal": True,
     # build env config
     "target_os": "ios",
     "ios_min_target": "13.0",

@@ -29,6 +29,10 @@ jobs:
           - target_cpu: x64
             sub_env: iOSSimulator
             artifact_prefix: iossimulator-x64
+
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2

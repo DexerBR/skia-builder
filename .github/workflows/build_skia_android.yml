@@ -28,6 +28,10 @@ jobs:
             artifact_prefix: android-x64
           - target_cpu: x86
             artifact_prefix: android-x86
+
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2

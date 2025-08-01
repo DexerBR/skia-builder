@@ -12,58 +12,84 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-android:
+  build-android-all:
     if: |
       startsWith(github.ref, 'refs/tags/') ||
       (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'ci/build-binaries-android'))
     runs-on: windows-latest
-
-    permissions:
-      contents: write
-
+    strategy:
+      matrix:
+        include:
+          - target_cpu: arm
+            artifact_prefix: android-arm
+          - target_cpu: arm64
+            artifact_prefix: android-arm64
+          - target_cpu: x64
+            artifact_prefix: android-x64
+          - target_cpu: x86
+            artifact_prefix: android-x86
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
 
-    - name: Set up python
-      uses: actions/setup-python@v5.3.0
-      with:
-        python-version: '3.11'
+      - name: Set up python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: '3.11'
 
-    - name: Install skia-builder
-      run: |
-        pip install .
+      - name: Install skia-builder
+        run: |
+          pip install .
 
-    - name: Setup skia environment for Android
-      run: |
-        skia-builder setup-env --sub-env=Android
+      - name: Setup skia environment for Android
+        run: skia-builder setup-env --sub-env=Android
+      
+      - name: Build skia for Android
+        run: skia-builder build --sub-env=Android --target-cpu=${{ matrix.target_cpu}} --archive
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: skia-artifacts-${{ matrix.artifact_prefix }}
+          path: output/${{ matrix.artifact_prefix }}/${{ matrix.artifact_prefix }}.tar.gz
 
-    - name: Build skia for Android
-      run: |
-        skia-builder build --sub-env=Android --target-cpu=arm --archive
-        skia-builder build --sub-env=Android --target-cpu=arm64 --archive
-        skia-builder build --sub-env=Android --target-cpu=x64 --archive
-        skia-builder build --sub-env=Android --target-cpu=x86 --archive
-
-    - name: Upload artifacts
-      if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4.4.3
-      with:
-        name: skia-artifacts-android
-        path: |
-          output/android-arm/android-arm.tar.gz
-          output/android-arm64/android-arm64.tar.gz
-          output/android-x64/android-x64.tar.gz
-          output/android-x86/android-x86.tar.gz
-
-    - name: Upload artifacts to release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2.2.1
-      with:
-        name: ${{ github.ref_name }}
-        files: |
-          output/android-arm/android-arm.tar.gz
-          output/android-arm64/android-arm64.tar.gz
-          output/android-x64/android-x64.tar.gz
-          output/android-x86/android-x86.tar.gz
-        draft: true
+  merge-artifacts:
+    needs: [build-android-all]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: skia-artifacts-android-arm
+          path: output/android-arm
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: skia-artifacts-android-arm64
+          path: output/android-arm64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: skia-artifacts-android-x64
+          path: output/android-x64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: skia-artifacts-android-x86
+          path: output/android-x86
+      - run: |
+          mkdir -p output/android-merged
+          cp output/android-arm/android-arm.tar.gz output/android-merged/
+          cp output/android-arm64/android-arm64.tar.gz output/android-merged/
+          cp output/android-x64/android-x64.tar.gz output/android-merged/
+          cp output/android-x86/android-x86.tar.gz output/android-merged/
+          tar -czf output/android-merged.tar.gz -C output/android-merged .
+      - name: Upload artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: skia-artifacts-android-merged
+          path: output/android-merged.tar.gz
+      - name: Upload artifacts to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          name: ${{ github.ref_name }}
+          files: output/android-merged.tar.gz
+          draft: true

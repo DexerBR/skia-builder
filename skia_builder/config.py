@@ -141,6 +141,7 @@ platform_specific_flags = {
     "linux-x64": {
         **linux_base_flags,
         "target_cpu": "x86_64",
+        "skia_use_system_freetype2": False,
         "extra_cflags": [
             *linux_base_flags["extra_cflags"],
             "-fPIC",

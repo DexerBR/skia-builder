@@ -280,6 +280,17 @@ class CommonPlatformManager:
 
         run_command(
             [
+                gn_executable,
+                "args",
+                "--list",
+                f"out/{build_target}",
+            ],
+            f"Listing current build arguments for {build_target}",
+            cwd=skia_path,
+        )
+
+        run_command(
+            [
                 ninja_executable,
                 "-C",
                 f"out/{build_target}",

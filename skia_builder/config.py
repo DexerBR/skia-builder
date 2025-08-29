@@ -71,6 +71,7 @@ android_base_flags = {
     "extra_cflags_cc": ["-std=c++17"],
     # extra (temporary?) arguments
     "skia_use_system_freetype2": False,
+    "skia_use_system_icu": True,
 }
 
 

@@ -348,6 +348,39 @@ class CommonPlatformManager:
             archive_output,
         )
 
+    @classmethod
+    def list_build_arguments(cls):
+        """List available build arguments by creating a temporary build configuration."""
+        if not cls.TARGET_PLATFORM:
+            Logger.error("Unsupported target platform")
+            sys.exit(1)
+
+        skia_path = os.path.join(os.getcwd(), "skia")
+        dummy_dir = os.path.join(skia_path, "out", "dummy")
+
+        gn_executable = cls._get_executable_path(
+            "skia",
+            "bin",
+            executable_name="gn",
+            windows_extension=".exe",
+        )
+
+        run_command(
+            [gn_executable, "gen", "out/dummy"],
+            "Generating dummy build files",
+            cwd=skia_path,
+        )
+
+        run_command(
+            [gn_executable, "args", "--list", "out/dummy"],
+            "Listing available build arguments",
+            cwd=skia_path,
+        )
+
+        if os.path.exists(dummy_dir):
+            shutil.rmtree(dummy_dir)
+            Logger.info("Cleaned up temporary dummy directory")
+
 
 class CommonSubPlatformManager(CommonPlatformManager):
     HOST_PLATFORMS_ENV_SETUP = {}

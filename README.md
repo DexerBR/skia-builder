@@ -85,6 +85,17 @@ skia-builder setup-env --sub-env=Android
 
 <br>
 
+### Listing available build arguments
+
+The `list-args` command displays all available build configuration arguments supported by the Skia version. These flags can be overridden using `--custom-build-args` or `--override-build-args`.
+
+```
+skia-builder list-args
+```
+
+
+<br>
+
 ### Generating Skia binaries
 
 To generate the binaries, **it is necessary to specify the target architecture**. Optionally, the `--archive` command can be used to archive the output binaries to `output/<OS>-<architecture>/*` and to generate a compressed file in `output/<OS><architecture>/<OS>-<architecture>.tar.gz`.

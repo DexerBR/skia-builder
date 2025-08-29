@@ -55,6 +55,15 @@ def build(
     manager.build(target_cpu, custom_build_args, override_build_args, archive_build_output)
 
 
+def list_build_arguments(host_platform):
+    manager = PLATFORM_MANAGERS.get(host_platform)
+    if manager is None:
+        Logger.error(f"Unsupported target platform: {host_platform}")
+        sys.exit(1)
+
+    manager.list_build_arguments()
+
+
 def main():
     parser = argparse.ArgumentParser(prog="skia-builder", description="Skia Builder Script")
     subparsers = parser.add_subparsers(dest="command")
@@ -101,6 +110,10 @@ def main():
     )
     build_parser.set_defaults(func=build)
 
+    # list-args subcommand
+    list_args_parser = subparsers.add_parser("list-args", help="List available build arguments")
+    list_args_parser.set_defaults(func=list_build_arguments)
+
     args = parser.parse_args()
     current_platform = "macOS" if platform.system() == "Darwin" else platform.system()
 
@@ -138,6 +151,9 @@ def main():
             args.archive,
             args.sub_env,
         )
+
+    elif args.command == "list-args":
+        list_build_arguments(current_platform)
 
     else:
         Logger.error(f"Unsupported command: {args.command}")

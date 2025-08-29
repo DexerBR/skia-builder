@@ -111,7 +111,9 @@ def main():
     build_parser.set_defaults(func=build)
 
     # list-available-args subcommand
-    list_args_parser = subparsers.add_parser("list-available-args", help="List available build arguments")
+    list_args_parser = subparsers.add_parser(
+        "list-available-args", help="List available build arguments"
+    )
     list_args_parser.set_defaults(func=list_build_arguments)
 
     args = parser.parse_args()

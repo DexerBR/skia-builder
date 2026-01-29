@@ -7,7 +7,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/skia-builder?style=flat-square&color=blue)](https://pypi.org/project/skia-builder/)
 
-![SKIA_VERSION](https://img.shields.io/badge/Skia_version-m144-blue?style=flat-square)
+![SKIA_VERSION](https://img.shields.io/badge/Skia_version-m145-blue?style=flat-square)
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_linux.yml?event=push&style=flat-square&label=Linux%20build)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/DexerBR/skia-builder/build_skia_macos.yml?event=push&style=flat-square&label=macOS%20build)

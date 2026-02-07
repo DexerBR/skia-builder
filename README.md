@@ -50,6 +50,23 @@ The `setup-env` command of `skia-builder` can be used to configure two types of 
 
 ***Note:*** The sub-environment configuration automatically sets up the main (host) environment.
 
+#### Version Management
+
+You can specify custom versions for Skia and Android NDK during environment setup using the following arguments:
+
+- `--skia-version`: Specifies the Skia milestone version (e.g., `m144`, `m145`)
+- `--android-ndk`: Specifies the Android NDK version (e.g., `r27c`, `r28`)
+
+**Minimum Supported Versions:**
+- Skia: `m140`
+- Android NDK: `r27d`
+
+***Note:*** Using versions below the minimum supported versions may result in build failures. If it does, you may need to adjust the build arguments using `--custom-build-args` or verify your environment setup. The build arguments are optimized for the current default versions. While older versions might work, compatibility is not guaranteed. 
+
+If these arguments are not provided, the default versions defined in `versions.py` will be used.
+
+---
+
 #### LLVM Installation
 
 LLVM is automatically installed on Linux and Windows platforms. However, the installation process varies between operating systems. Below are the detailed instructions for each platform:
@@ -70,8 +87,22 @@ Automatically detects the OS and architecture and configures the main environmen
 skia-builder setup-env
 ```
 
-If the user wants to manually manage the LLVM installation (or use a different compiler), they can pass the following argument when setting up the environment, which will skip the automatic LLVM installation:
+Setup environment with a specific Skia version:
+```
+skia-builder setup-env --skia-version m145
+```
 
+Setup Android environment with specific Skia and NDK versions:
+```
+skia-builder setup-env --sub-env=Android --skia-version m145 --android-ndk r28
+```
+
+Setup iOS environment with a specific Skia version:
+```
+skia-builder setup-env --sub-env=iOS --skia-version m145
+```
+
+If the user wants to manually manage the LLVM installation (or use a different compiler), they can pass the following argument when setting up the environment, which will skip the automatic LLVM installation:
 ```
 skia-builder setup-env --skip-llvm-instalation
 ```
@@ -99,6 +130,8 @@ skia-builder list-available-args
 ### Generating Skia binaries
 
 To generate the binaries, **it is necessary to specify the target architecture**. Optionally, the `--archive` command can be used to archive the output binaries to `output/<OS>-<architecture>/*` and to generate a compressed file in `output/<OS><architecture>/<OS>-<architecture>.tar.gz`.
+
+***Note:*** The build command uses the Skia version and Android NDK version that were set during the `setup-env` step. Make sure to run `setup-env` with the desired versions before building.
 
 #### Examples:
 

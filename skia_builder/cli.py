@@ -1,67 +1,7 @@
 import argparse
+import os
 import platform
 import sys
-
-from skia_builder.config import parse_custom_build_args
-from skia_builder.platforms import android, ios, iossimulator, linux, macos, windows
-from skia_builder.utils import Logger
-
-
-PLATFORM_MANAGERS = {
-    "Android": android.AndroidPlatformManager,
-    "iOS": ios.IOSPlatformManager,
-    "iOSSimulator": iossimulator.IOSSimulatorPlatformManager,
-    "Linux": linux.LinuxPlatformManager,
-    "macOS": macos.MacOSPlatformManager,
-    "Windows": windows.WindowsPlatformManager,
-}
-
-
-def get_supported_architectures(target_platform):
-    manager = PLATFORM_MANAGERS.get(target_platform)
-    if manager is None:
-        raise ValueError(f"Unsupported platform: {target_platform}")
-    return manager.SUPPORTED_ARCHITECTURES
-
-
-def setup_env(host_platform, sub_env=None, skip_llvm_instalation=False):
-    # Use sub_env if provided, otherwise default to the detected platform
-    target_platform = sub_env if sub_env else host_platform
-
-    manager = PLATFORM_MANAGERS.get(target_platform)
-    if manager is None:
-        Logger.error(f"Unsupported target platform: {target_platform}")
-        sys.exit(1)
-
-    manager.setup_env(skip_llvm_instalation)
-
-
-def build(
-    host_platform,
-    target_cpu,
-    custom_build_args,
-    override_build_args,
-    archive_build_output,
-    sub_env=None,
-):
-    # Use sub_env if provided, otherwise default to the detected platform
-    target_platform = sub_env if sub_env else host_platform
-
-    manager = PLATFORM_MANAGERS.get(target_platform)
-    if manager is None:
-        Logger.error(f"Unsupported target platform: {target_platform}")
-        sys.exit(1)
-
-    manager.build(target_cpu, custom_build_args, override_build_args, archive_build_output)
-
-
-def list_build_arguments(host_platform):
-    manager = PLATFORM_MANAGERS.get(host_platform)
-    if manager is None:
-        Logger.error(f"Unsupported target platform: {host_platform}")
-        sys.exit(1)
-
-    manager.list_build_arguments()
 
 
 def main():
@@ -81,7 +21,10 @@ def main():
         action="store_true",
         help="Skip the installation of LLVM during environment setup",
     )
-    setup_env_parser.set_defaults(func=setup_env)
+    setup_env_parser.add_argument(
+        "--android-ndk", type=str, help="Android NDK version (e.g., r27c, r28)"
+    )
+    setup_env_parser.add_argument("--skia-version", type=str, help="Skia version")
 
     # build subcommand
     build_parser = subparsers.add_parser("build", help="Builds the skia binaries")
@@ -108,15 +51,105 @@ def main():
     build_parser.add_argument(
         "--archive", action="store_true", help="Archive the build output after compilation"
     )
-    build_parser.set_defaults(func=build)
 
     # list-available-args subcommand
-    list_args_parser = subparsers.add_parser(
-        "list-available-args", help="List available build arguments"
-    )
-    list_args_parser.set_defaults(func=list_build_arguments)
+    subparsers.add_parser("list-available-args", help="List available build arguments")
 
     args = parser.parse_args()
+
+    # Set environment variables before importing modules
+    if android_ndk := getattr(args, "android_ndk", None):
+        os.environ["SKIA_ANDROID_NDK_VERSION"] = android_ndk
+    if skia_version := getattr(args, "skia_version", None):
+        os.environ["SKIA_VERSION"] = skia_version
+
+    # Later import, so env vars will be available to versions.py
+    from skia_builder.config import parse_custom_build_args
+    from skia_builder.platforms import android, ios, iossimulator, linux, macos, windows
+    from skia_builder.utils import Logger
+
+    PLATFORM_MANAGERS = {
+        "Android": android.AndroidPlatformManager,
+        "iOS": ios.IOSPlatformManager,
+        "iOSSimulator": iossimulator.IOSSimulatorPlatformManager,
+        "Linux": linux.LinuxPlatformManager,
+        "macOS": macos.MacOSPlatformManager,
+        "Windows": windows.WindowsPlatformManager,
+    }
+
+    def validate_versions():
+        from skia_builder.versions import (
+            ANDROID_NDK_VERSION,
+            SKIA_VERSION,
+            MIN_ANDROID_NDK_VERSION,
+            MIN_SKIA_VERSION,
+        )
+
+        # Extract numeric part for comparison
+        def extract_version_number(version, prefix):
+            return int(version.replace(prefix, "").rstrip("abcdefghijklmnopqrstuvwxyz"))
+
+        # Validate NDK
+        ndk_num = extract_version_number(ANDROID_NDK_VERSION, "r")
+        min_ndk_num = extract_version_number(MIN_ANDROID_NDK_VERSION, "r")
+
+        if ndk_num < min_ndk_num:
+            Logger.warning(
+                f"Android NDK version {ANDROID_NDK_VERSION} is below the minimum "
+                f"supported version {MIN_ANDROID_NDK_VERSION}. Build may fail."
+            )
+
+        # Validate Skia
+        skia_num = extract_version_number(SKIA_VERSION, "m")
+        min_skia_num = extract_version_number(MIN_SKIA_VERSION, "m")
+
+        if skia_num < min_skia_num:
+            Logger.warning(
+                f"Skia version {SKIA_VERSION} is below the minimum supported version "
+                f"{MIN_SKIA_VERSION}. Build may fail. If it does, you may need to adjust "
+                f"build arguments using --custom-build-args or verify your environment setup."
+            )
+
+    def get_supported_architectures(target_platform):
+        manager = PLATFORM_MANAGERS.get(target_platform)
+        if manager is None:
+            raise ValueError(f"Unsupported platform: {target_platform}")
+        return manager.SUPPORTED_ARCHITECTURES
+
+    def setup_env(host_platform, sub_env=None, skip_llvm_instalation=False):
+        target_platform = sub_env if sub_env else host_platform
+        manager = PLATFORM_MANAGERS.get(target_platform)
+        if manager is None:
+            Logger.error(f"Unsupported target platform: {target_platform}")
+            sys.exit(1)
+        manager.setup_env(skip_llvm_instalation)
+
+    def build(
+        host_platform,
+        target_cpu,
+        custom_build_args,
+        override_build_args,
+        archive_build_output,
+        sub_env=None,
+    ):
+        target_platform = sub_env if sub_env else host_platform
+        manager = PLATFORM_MANAGERS.get(target_platform)
+        if manager is None:
+            Logger.error(f"Unsupported target platform: {target_platform}")
+            sys.exit(1)
+        manager.build(target_cpu, custom_build_args, override_build_args, archive_build_output)
+
+    def list_build_arguments(host_platform):
+        manager = PLATFORM_MANAGERS.get(host_platform)
+        if manager is None:
+            Logger.error(f"Unsupported target platform: {host_platform}")
+            sys.exit(1)
+        manager.list_build_arguments()
+
+    # Validate versions
+    if args.command in ["setup-env", "build"]:
+        validate_versions()
+
     current_platform = "macOS" if platform.system() == "Darwin" else platform.system()
 
     if args.command == "setup-env":

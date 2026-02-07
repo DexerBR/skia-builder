@@ -220,6 +220,8 @@ def archive_build_output(build_input_src, target_platform, output_dir=None):
 
 
 def check_update_skia_version():
+    from skia_builder.versions import SKIA_VERSION
+
     chromium_url = (
         "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Windows&num=1"
     )
@@ -261,6 +263,12 @@ def check_update_skia_version():
         )
         sys.exit(0)
 
+    # Check if current version is already up to date
+    current_version = SKIA_VERSION.replace("m", "")
+    if current_version == str(milestone):
+        Logger.info(f"SKIA_VERSION is already at m{milestone}. No update needed.")
+        sys.exit(0)
+
     Logger.info(
         f"Found new Skia stable milestone {milestone}. "
         f"Proceeding with updates to {versions_file} and {readme_file}."
@@ -279,9 +287,11 @@ def check_update_skia_version():
         Logger.error(f"Error reading {versions_file}: {e}. Unable to proceed with version update.")
         sys.exit(1)
 
-    # Updating version in versions.py
+    # Updating version in versions.py (keeping default value)
     new_versions_content, _ = re.subn(
-        r'SKIA_VERSION = "m\d+"', f'SKIA_VERSION = "m{milestone}"', versions_content
+        r'SKIA_VERSION = os\.getenv\("SKIA_VERSION", "m\d+"\)',
+        f'SKIA_VERSION = os.getenv("SKIA_VERSION", "m{milestone}")',
+        versions_content,
     )
 
     if versions_content == new_versions_content:
@@ -290,7 +300,7 @@ def check_update_skia_version():
         try:
             versions_file_path.write_text(new_versions_content, encoding="utf-8")
             Logger.info(
-                f"Successfully updated {versions_file}: Set SKIA_VERSION to 'm{milestone}'."
+                f"Successfully updated {versions_file}: Set SKIA_VERSION default to 'm{milestone}'."
             )
         except Exception as e:
             Logger.error(

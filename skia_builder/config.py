@@ -15,7 +15,7 @@ bin_extensions_by_platform = {
 }
 
 
-common_flags = {
+core_flags = {
     # Removes debug symbols from the binary to reduce its size (required for linux/macos)
     # - Fixed here: Stop forcing debug symbol generation with skia_enable_optimize_size
     # | https://skia-review.googlesource.com/c/skia/+/892217
@@ -35,22 +35,35 @@ common_flags = {
     "skia_enable_skshaper": True,
     "skia_enable_skparagraph": True,
     "skia_enable_ganesh": True,
-    # "skia_enable_skresources": True,
-    # "skia_enable_sksg": True,
-    # "skia_enable_fontmgr_custom_directory": False,
-    # "skia_enable_skjson": True,
-    # "skia_use_icu": True,
-    # "skia_use_freetype": True,
-    "skia_use_system_expat": False,
+}
+
+# Third-party dependency flags
+# IMPORTANT: skia_use_system_* flags must only be set when their corresponding
+# dependency is enabled. When skia_use_foo=false, third_party/foo/BUILD.gn is
+# excluded from the build, causing skia_use_system_foo to become an undefined
+# variable. This generates GN warnings that pollute JSON output and can break
+# build scripts like find_headers.py (seen in iOS builds).
+third_party_flags = {
     "skia_use_system_libjpeg_turbo": False,
     "skia_use_system_libpng": False,
     "skia_use_system_libwebp": False,
     "skia_use_system_zlib": False,
     "skia_use_system_icu": False,
     "skia_use_system_harfbuzz": False,
-    # "skia_use_system_freetype2": False,
 }
 
+# Expat is disabled on iOS (skia_use_expat=false), so we separate
+# expat system flags for iOS vs other platforms (Windows, Linux, Android, macOS)
+third_party_flags_with_expat = {
+    **third_party_flags,
+    "skia_use_system_expat": False,
+}
+
+# Common flags for most platforms
+common_flags = {
+    **core_flags,
+    **third_party_flags_with_expat,
+}
 
 android_base_flags = {
     **common_flags,
@@ -67,7 +80,6 @@ android_base_flags = {
     "cc": "clang",
     "cxx": "clang++",
     "extra_cflags_cc": ["-std=c++17"],
-    # extra (temporary?) arguments
     "skia_use_system_freetype2": False,
 }
 
@@ -102,9 +114,11 @@ macos_base_flags = {
     "skia_gl_standard": "gles",
 }
 
+# iOS flags: uses core_flags + third_party_flags without expat
+# because iOS disables expat entirely
 ios_base_flags = {
-    **common_flags,
-    # graphics backends
+    **core_flags,
+    **third_party_flags,
     "skia_use_gl": True,
     "skia_use_vulkan": False,
     "skia_use_direct3d": False,

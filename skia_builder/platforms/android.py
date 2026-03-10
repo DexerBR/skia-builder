@@ -3,7 +3,7 @@ import os
 from skia_builder.platforms.common import CommonSubPlatformManager, SubPlatform
 from skia_builder.platforms.windows import WindowsPlatformManager
 from skia_builder.utils import run_command
-from skia_builder.versions import ANDROID_NDK
+from skia_builder.versions import ANDROID_NDK_VERSION
 
 
 class AndroidPlatformManager(CommonSubPlatformManager):
@@ -17,8 +17,8 @@ class AndroidPlatformManager(CommonSubPlatformManager):
             [
                 "curl",
                 "-o",
-                f"Android_NDK/{ANDROID_NDK}-windows.zip",
-                f"https://dl.google.com/android/repository/{ANDROID_NDK}-windows.zip",
+                f"Android_NDK/{ANDROID_NDK_VERSION}-windows.zip",
+                f"https://dl.google.com/android/repository/android-ndk-{ANDROID_NDK_VERSION}-windows.zip"
             ],
             "Downloading Android NDK",
         )
@@ -27,7 +27,7 @@ class AndroidPlatformManager(CommonSubPlatformManager):
             [
                 "powershell",
                 "-Command",
-                f"Expand-Archive -Path 'Android_NDK/{ANDROID_NDK}-windows.zip' "
+                f"Expand-Archive -Path 'Android_NDK/{ANDROID_NDK_VERSION}-windows.zip' "
                 "-DestinationPath 'Android_NDK'",
             ],
             "Extracting Android NDK",

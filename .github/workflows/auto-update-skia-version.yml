@@ -1,11 +1,11 @@
 name: Update Skia Version
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
-env:
-  NEW_SKIA_VERSION: ""
+# on:
+#   workflow_dispatch:
+#   schedule:
+#     - cron: '0 0 * * *'
+# env:
+#   NEW_SKIA_VERSION: ""
 
 jobs:
   update-skia-version:
